@@ -14,17 +14,15 @@ public class Task {
         this.status = status;
     }
 
-    public Task(int id, String name, String description){
-        this.id = id;
+    public Task(String name, String description, TaskStatus status){
         this.name = name;
         this.description = description;
-        status = TaskStatus.NEW;
+        this.status = status;
     }
 
     public Task (String name, String description){
         this.name = name;
         this.description = description;
-        status = TaskStatus.NEW;
     }
 
     public int getId(){

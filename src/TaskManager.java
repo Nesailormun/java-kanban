@@ -4,8 +4,6 @@ import java.util.ArrayList;
 public class TaskManager {
 
     private int taskId = 1;
-    private int epicId = 1;
-    private int subtaskId = 1;
     private final HashMap<Integer, Task> taskStorage = new HashMap<>();
     private final HashMap<Integer, Epic> epicStorage = new HashMap<>();
     private final HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
@@ -14,10 +12,8 @@ public class TaskManager {
 
     public Task getTaskById(int id) {
         if (taskStorage.containsKey(id)) {
-            System.out.println("Ваша задача найдена!");
             return taskStorage.get(id);
         }
-        System.out.println("Такой задачи у нас нет!");
         return null;
     }
 
@@ -25,11 +21,13 @@ public class TaskManager {
         if(task == null){
             return null;
         }
-        task.setStatus(TaskStatus.NEW);
         if (task.getId() == 0) {
             task.setId(taskId);
         }
-        taskStorage.put(task.id, task);
+        if (task.getStatus() == null){
+            task.setStatus(TaskStatus.NEW);
+        }
+        taskStorage.put(task.getId(), task);
         taskId++;
         return task;
     }
@@ -40,29 +38,25 @@ public class TaskManager {
         }
         if (taskStorage.containsKey(task.getId())){
             taskStorage.put(task.getId(), task);
-        } else {
-            System.out.println("Задачи с таким номером нет!");
         }
     }
 
     public void removeTask (int id){
-        System.out.println("Задача: " + taskStorage.get(id).name + " удалена!");
+        if (!taskStorage.containsKey(id)){
+            return;
+        }
         taskStorage.remove(id);
     }
 
     public void deleteAllTasks () {
-        if (taskId != 1) {
+        if (!taskStorage.isEmpty()) {
             taskStorage.clear();
-            taskId = 1;
-            System.out.println("Список задач очищен!");
-        } else {
-            System.out.println("Трекер задач пуст!");
         }
     }
 
     public ArrayList<Task> getAllTasks(){
-        if (taskId != 1) {
-            return new ArrayList<Task>(taskStorage.values());
+        if (!taskStorage.isEmpty()) {
+            return new ArrayList<>(taskStorage.values());
         }
         return null;
     }
@@ -73,12 +67,12 @@ public class TaskManager {
         if(epic == null){
             return null;
         }
-        if (epic.getId() == 0) {
-            epic.setId(epicId);
+        if ((epic.getId() == 0)) {
+            epic.setId(taskId);
         }
         epic.setStatus(calculateEpicStatus(epic));
         epicStorage.put(epic.getId(), epic);
-        epicId++;
+        taskId++;
         return epic;
     }
 
@@ -89,48 +83,41 @@ public class TaskManager {
         if (epicStorage.containsKey(epic.getId())){
             epicStorage.get(epic.getId()).setName(epic.getName());
             epicStorage.get(epic.getId()).setDescription(epic.getDescription());
-            epic.setStatus(calculateEpicStatus(epic));
-        } else {
-            System.out.println("Эпика с таким номером нет!");
         }
     }
 
     public Epic getEpicById(int id) {
         if (epicStorage.containsKey(id)) {
-            System.out.println("Ваш эпик найден!");
-            epicStorage.get(id).setStatus(calculateEpicStatus(epicStorage.get(id)));
             return epicStorage.get(id);
         }
-        System.out.println("Такого эпика у нас нет!");
         return null;
     }
 
     public ArrayList<Epic> getAllEpics(){
-        if (epicId != 1) {
-            for (Epic epic : epicStorage.values()){
-                epic.setStatus(calculateEpicStatus(epic));
-            }
-            return new ArrayList<Epic>(epicStorage.values());
+        if (!epicStorage.isEmpty()) {
+            return new ArrayList<>(epicStorage.values());
         }
         return null;
     }
 
     public void removeEpic (int id){
-        System.out.println("Эпик: " + epicStorage.get(id).name + " удалена!");
+        if (!epicStorage.containsKey(id)){
+            return;
+        }
+        for (int subtaskId : epicStorage.get(id).getSubtasksId()){
+            subtaskStorage.remove(subtaskId);
+        }
         epicStorage.remove(id);
     }
 
     public void deleteAllEpics(){
-        if (epicId != 1) {
+        if (!epicStorage.isEmpty()) {
             epicStorage.clear();
-            epicId = 1;
-            System.out.println("Список эпиков очищен!");
-        } else {
-            System.out.println("Трекер задач пуст!");
+            subtaskStorage.clear();
         }
     }
 
-    public TaskStatus calculateEpicStatus(Epic epic){
+    private TaskStatus calculateEpicStatus(Epic epic){
         ArrayList<Integer> listOfSubtaskIDs = epic.getSubtasksId();
         if (listOfSubtaskIDs.isEmpty()){
             return TaskStatus.NEW;
@@ -138,9 +125,9 @@ public class TaskManager {
         int numOfDoneSubtasks = 0;
         int numOfNewSubtask = 0;
         for (int subtaskId : listOfSubtaskIDs){
-            if (subtaskStorage.get(subtaskId).getStatus().equals(TaskStatus.DONE)){
+            if (TaskStatus.DONE.equals(subtaskStorage.get(subtaskId).getStatus())){
                 numOfDoneSubtasks++;
-            } else if (subtaskStorage.get(subtaskId).getStatus().equals(TaskStatus.NEW)){
+            } else if (TaskStatus.NEW.equals(subtaskStorage.get(subtaskId).getStatus())){
                 numOfNewSubtask++;
             }
         }
@@ -175,18 +162,19 @@ public class TaskManager {
         }
         int idOfEpic = subtask.getEpicId();
         if (!epicStorage.containsKey(idOfEpic)){
-            System.out.println("Не существует соответствующего Эпика для подзадачи!");
             return null;
         }
-        if(subtask.getId() == 0){
-            subtask.setId(subtaskId);
+        if (subtask.getId() == 0){
+            subtask.setId(taskId);
+        }
+        if (subtask.getStatus() == null){
+            subtask.setStatus(TaskStatus.NEW);
         }
         Epic epic = epicStorage.get(idOfEpic);
         epic.addSubtask(subtask.getId());
-        subtask.setStatus(TaskStatus.NEW);
         subtaskStorage.put(subtask.getId(), subtask);
         epic.setStatus(calculateEpicStatus(epic));
-        subtaskId++;
+        taskId++;
         return subtask;
     }
 
@@ -212,16 +200,14 @@ public class TaskManager {
 
     public Subtask getSubtaskById (int id){
         if (subtaskStorage.containsKey(id)) {
-            System.out.println("Ваша задача найдена!");
             return subtaskStorage.get(id);
         }
-        System.out.println("Такой задачи у нас нет!");
         return null;
     }
 
     public ArrayList<Subtask> getAllSubtasks(){
-        if (subtaskId != 1) {
-            return new ArrayList<Subtask>(subtaskStorage.values());
+        if (!subtaskStorage.isEmpty()) {
+            return new ArrayList<>(subtaskStorage.values());
         }
         return null;
     }

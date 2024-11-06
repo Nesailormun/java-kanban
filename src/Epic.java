@@ -4,12 +4,13 @@ public class Epic extends Task {
 
     private final ArrayList<Integer> subtasksId = new ArrayList<>();
 
-    public Epic(int id, String name, String description){
-        super(id, name, description);
-    }
-
     public Epic(String name, String description){
         super(name, description);
+    }
+
+    public Epic (int id, String name, String description){
+        super(name, description);
+        this.id = id;
     }
 
     public void addSubtask(int subtaskId) {
@@ -17,11 +18,7 @@ public class Epic extends Task {
     }
 
     public void deleteSubtask(int subtaskId) {
-        for (int i = 0; i < subtasksId.size(); i++) {
-            if (subtasksId.get(i) == subtaskId) {
-                subtasksId.remove(i);
-            }
-        }
+        subtasksId.remove(Integer.valueOf(subtaskId));
     }
 
     public void clearSubtasksList() {
@@ -29,7 +26,7 @@ public class Epic extends Task {
     }
 
     public ArrayList<Integer> getSubtasksId(){
-        return subtasksId;
+        return new ArrayList<>(subtasksId);
     }
 
     @Override
