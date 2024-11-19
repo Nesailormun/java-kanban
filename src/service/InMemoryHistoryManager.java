@@ -1,3 +1,7 @@
+package service;
+
+import module.Task;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +17,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory(){
-        if (taskHistoryStorage.isEmpty()) return null;
+        if (taskHistoryStorage.isEmpty()) return new ArrayList<>();
         return taskHistoryStorage;
     }
 

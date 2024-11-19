@@ -3,6 +3,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import module.*;
+import service.*;
 
 class InMemoryTaskManagerTest {
     TaskManager taskManager;
@@ -16,9 +18,9 @@ class InMemoryTaskManagerTest {
     @Test
     void assertManagerIsWorkingCorrectly() {
         assertInstanceOf(InMemoryHistoryManager.class, Manager.getDefaultHistory(), "getDefaultHistory" +
-                " не создает экземпляр менеджера InMemoryHistoryManager");
-        assertInstanceOf(TaskManager.class, taskManager, "Manager не создает проинициализированный экземпляр" +
-                " менеджера TaskManager");
+                " не создает экземпляр менеджера service.InMemoryHistoryManager");
+        assertInstanceOf(TaskManager.class, taskManager, "service.Manager не создает проинициализированный экземпляр" +
+                " менеджера service.TaskManager");
     }
 
     @Test
@@ -151,7 +153,7 @@ class InMemoryTaskManagerTest {
     @Test
     void testHistoryManager() {
 
-        assertNull(taskManager.getHistory(), "История тасков должна быть пуста");
+        assertTrue(taskManager.getHistory().isEmpty(), "История тасков должна быть пуста");
         Task task1 = taskManager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
         Task task2 = taskManager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
         Task task3 = taskManager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW));
@@ -190,9 +192,9 @@ class InMemoryTaskManagerTest {
         taskManager.getSubtaskById(subtask5.getId());
         assertEquals(10, taskManager.getHistory().size(), "В истории больше чем 10 последних тасков");
 
-        assertEquals(task3, taskManager.getHistory().getFirst(), "Объект добавленный в HistoryManager не" +
+        assertEquals(task3, taskManager.getHistory().getFirst(), "Объект добавленный в service.HistoryManager не" +
                 "равен своей предыдущей версии до добавления");
-        assertEquals(subtask5, taskManager.getHistory().getLast(), "Объект добавленный в HistoryManager не" +
+        assertEquals(subtask5, taskManager.getHistory().getLast(), "Объект добавленный в service.HistoryManager не" +
                 "равен своей предыдущей версии до добавления");
 
         int id = task3.getId();

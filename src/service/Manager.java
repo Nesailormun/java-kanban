@@ -1,3 +1,5 @@
+package service;
+
 public class Manager {
 
     public static HistoryManager getDefaultHistory(){

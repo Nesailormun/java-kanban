@@ -1,3 +1,5 @@
+package module;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -31,7 +33,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{" +
+        return "module.Epic{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +

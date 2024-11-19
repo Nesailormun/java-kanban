@@ -1,13 +1,18 @@
+package service;
+
+import module.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
     private int taskId = 1;
-    private final HashMap<Integer, Task> taskStorage = new HashMap<>();
-    private final HashMap<Integer, Epic> epicStorage = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtaskStorage = new HashMap<>();
+    private final Map<Integer, Task> taskStorage = new HashMap<>();
+    private final Map<Integer, Epic> epicStorage = new HashMap<>();
+    private final Map<Integer, Subtask> subtaskStorage = new HashMap<>();
     private final HistoryManager historyManager = Manager.getDefaultHistory();
 
     @Override
@@ -15,8 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    // Beginning of Task methods:
-
+    // Beginning of module.Task methods:
 
     @Override
     public Task getTaskById(int id) {
@@ -69,14 +73,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getAllTasks() {
+    public List<Task> getAllTasks() {
         if (!taskStorage.isEmpty()) {
             return new ArrayList<>(taskStorage.values());
         }
         return null;
     }
 
-    // Beginning of Epic methods:
+    // Beginning of module.Epic methods:
 
     @Override
     public Epic createEpic(Epic epic) {
@@ -113,7 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Epic> getAllEpics() {
+    public List<Epic> getAllEpics() {
         if (!epicStorage.isEmpty()) {
             return new ArrayList<>(epicStorage.values());
         }
@@ -163,7 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getEpicsSubtasks(Epic epic) {
+    public List<Subtask> getEpicsSubtasks(Epic epic) {
         ArrayList<Subtask> subtasks = new ArrayList<>();
         if (epic == null) {
             return null;
@@ -177,7 +181,7 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
-    // Beginning of Subtask methods:
+    // Beginning of module.Subtask methods:
 
     @Override
     public Subtask createSubtask(Subtask subtask) {
@@ -233,7 +237,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Subtask> getAllSubtasks() {
+    public List<Subtask> getAllSubtasks() {
         if (!subtaskStorage.isEmpty()) {
             return new ArrayList<>(subtaskStorage.values());
         }
