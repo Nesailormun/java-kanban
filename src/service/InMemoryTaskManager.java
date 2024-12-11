@@ -16,7 +16,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HistoryManager historyManager = Manager.getDefaultHistory();
 
     @Override
-    public List<Task> getHistory(){
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
@@ -68,7 +68,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllTasks() {
         if (!taskStorage.isEmpty()) {
-            for (Integer id : taskStorage.keySet()){
+            for (Integer id : taskStorage.keySet()) {
                 historyManager.remove(id);
             }
             taskStorage.clear();
@@ -142,10 +142,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         if (!epicStorage.isEmpty()) {
-            for (Task task : historyManager.getHistory()){
-               if (task instanceof Epic || task instanceof Subtask){
-                   historyManager.remove(task.getId());
-               }
+            for (Task task : historyManager.getHistory()) {
+                if (task instanceof Epic || task instanceof Subtask) {
+                    historyManager.remove(task.getId());
+                }
             }
             epicStorage.clear();
             subtaskStorage.clear();
@@ -268,7 +268,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllSubtasks() {
         if (!subtaskStorage.isEmpty()) {
-           for (Integer id : subtaskStorage.keySet()){
+            for (Integer id : subtaskStorage.keySet()) {
                 historyManager.remove(id);
             }
             subtaskStorage.clear();

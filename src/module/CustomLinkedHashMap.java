@@ -35,10 +35,10 @@ public class CustomLinkedHashMap {
         return tasks;
     }
 
-    public void removeNode(Node node){
+    public void removeNode(Node node) {
         if (node == null) return;
-        for (Node elem = head; elem != null; elem = elem.getNext()){
-            if (node.getTask().equals(elem.getTask())){
+        for (Node elem = head; elem != null; elem = elem.getNext()) {
+            if (node.getTask().equals(elem.getTask())) {
                 final Node next = elem.getNext();
                 final Node prev = elem.getPrev();
                 if (prev == null) {
