@@ -27,7 +27,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        if (!history.getStorage().isEmpty()){
+        if (!history.getStorage().isEmpty()) {
             if (history.getStorage().containsKey(id)) {
                 history.removeNode(history.getStorage().get(id));
                 history.getStorage().remove(id);

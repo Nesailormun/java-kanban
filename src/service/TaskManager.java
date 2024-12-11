@@ -19,12 +19,11 @@ public interface TaskManager {
     Task createTask(Task task);
 
 
-
     void updateTask(Task task);
 
-    void removeTask (int id);
+    void removeTask(int id);
 
-    void deleteAllTasks ();
+    void deleteAllTasks();
 
     List<Task> getAllTasks();
 
@@ -39,12 +38,12 @@ public interface TaskManager {
 
     List<Epic> getAllEpics();
 
-    void removeEpic (int id);
+    void removeEpic(int id);
 
     void deleteAllEpics();
 
 
-   List<Subtask> getEpicsSubtasks(Epic epic);
+    List<Subtask> getEpicsSubtasks(Epic epic);
 
 
     // Beginning of module.Subtask methods:
@@ -53,12 +52,12 @@ public interface TaskManager {
 
     void updateSubtask(Subtask subtask);
 
-    Subtask getSubtaskById (int id);
+    Subtask getSubtaskById(int id);
 
     List<Subtask> getAllSubtasks();
 
-    void removeSubtask (int id);
+    void removeSubtask(int id);
 
-    void deleteAllSubtasks ();
+    void deleteAllSubtasks();
 }
 

@@ -55,7 +55,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void testEpics(){
+    void testEpics() {
         Epic epic1 = taskManager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         Epic epic2 = taskManager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
 
@@ -64,7 +64,7 @@ class InMemoryTaskManagerTest {
         assertNotNull(taskManager.getEpicById(epic1.getId()), "Эпик не добавлен в хранилище");
 
         assertEquals(taskManager.getEpicById(savedId), epic1, "Эпики с одинаковым ID не равны друг другу" +
-                        " при добавлении объекта в хранилище значение полей неизменно");
+                " при добавлении объекта в хранилище значение полей неизменно");
 
         taskManager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
                 epic1.getId()));
@@ -100,12 +100,12 @@ class InMemoryTaskManagerTest {
 
         for (int i : taskManager.getEpicById(epic2.getId()).getSubtasksId()) {
             Subtask testSubtask = taskManager.getSubtaskById(i);
-            for (Subtask subtaskInEpic : taskManager.getEpicsSubtasks(epic2)){
+            for (Subtask subtaskInEpic : taskManager.getEpicsSubtasks(epic2)) {
                 assertEquals(testSubtask, subtaskInEpic, "Эпик2 некорректно обновляет свои сабтаски");
             }
         }
 
-        Epic newEpic2 = taskManager.createEpic(new Epic (2,"NEWEPIC2", "SOME BIG EPIC"));
+        Epic newEpic2 = taskManager.createEpic(new Epic(2, "NEWEPIC2", "SOME BIG EPIC"));
         taskManager.updateEpic(newEpic2);
         assertNotEquals(epic2, taskManager.getEpicById(2), "Некорректное обновление эпика");
 
@@ -120,7 +120,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void testSubtask(){
+    void testSubtask() {
 
         Epic epic1 = taskManager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         Epic epic2 = taskManager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
@@ -135,7 +135,7 @@ class InMemoryTaskManagerTest {
                 epic2.getId()));
         taskManager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
                 epic2.getId()));
-        Subtask subtask6 = taskManager.createSubtask(new Subtask(45,"SomeNewSubtask", "ToDoInSubtask"
+        Subtask subtask6 = taskManager.createSubtask(new Subtask(45, "SomeNewSubtask", "ToDoInSubtask"
                 , TaskStatus.NEW, 2));
 
         assertEquals(subtask2.getEpicId(), epic1.getId(), "Сабтаск не знает свой эпик");
@@ -221,8 +221,10 @@ class InMemoryTaskManagerTest {
         taskManager.createTask(task1);
         taskManager.createTask(task2);
         Epic epic4 = taskManager.createEpic(new Epic("EPIC4", "SOMEEPIC4"));
-        Subtask subtask7 = taskManager.createSubtask(new Subtask("Subtask7", "Somesubtask7", epic4.getId()));
-        Subtask subtask8 = taskManager.createSubtask(new Subtask("Subtask8", "Somesubtask8", epic4.getId()));
+        Subtask subtask7 = taskManager.createSubtask(new Subtask("Subtask7", "Somesubtask7",
+                epic4.getId()));
+        Subtask subtask8 = taskManager.createSubtask(new Subtask("Subtask8", "Somesubtask8",
+                epic4.getId()));
 
 
         taskManager.getEpicById(epic4.getId());

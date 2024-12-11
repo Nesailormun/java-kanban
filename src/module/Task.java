@@ -9,32 +9,33 @@ public class Task {
     protected String description;
     protected TaskStatus status;
 
-    public Task(int id, String name, String description, TaskStatus status){
+    public Task(int id, String name, String description, TaskStatus status) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.status = status;
     }
 
-    public Task(String name, String description, TaskStatus status){
+    public Task(String name, String description, TaskStatus status) {
         this.name = name;
         this.description = description;
         this.status = status;
     }
 
-    public Task (String name, String description){
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public int getId(){
+    public int getId() {
         return id;
     }
 
-    public TaskStatus getStatus(){
+    public TaskStatus getStatus() {
         return status;
     }
-    public void setStatus(TaskStatus newStatus){
+
+    public void setStatus(TaskStatus newStatus) {
         status = newStatus;
     }
 
@@ -54,9 +55,10 @@ public class Task {
         this.description = description;
     }
 
-    public void setId (int newId){
+    public void setId(int newId) {
         id = newId;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
