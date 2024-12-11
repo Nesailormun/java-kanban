@@ -59,15 +59,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTask(int id) {
-        if (!taskStorage.containsKey(id)) {
-            return;
+        if (taskStorage.containsKey(id)) {
+            taskStorage.remove(id);
+            historyManager.remove(id);
         }
-        taskStorage.remove(id);
     }
 
     @Override
     public void deleteAllTasks() {
         if (!taskStorage.isEmpty()) {
+            for (Integer id : taskStorage.keySet()){
+                historyManager.remove(id);
+            }
             taskStorage.clear();
         }
     }
@@ -126,18 +129,24 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpic(int id) {
-        if (!epicStorage.containsKey(id)) {
-            return;
+        if (epicStorage.containsKey(id)) {
+            for (int subtaskId : epicStorage.get(id).getSubtasksId()) {
+                subtaskStorage.remove(subtaskId);
+                historyManager.remove(subtaskId);
+            }
+            epicStorage.remove(id);
+            historyManager.remove(id);
         }
-        for (int subtaskId : epicStorage.get(id).getSubtasksId()) {
-            subtaskStorage.remove(subtaskId);
-        }
-        epicStorage.remove(id);
     }
 
     @Override
     public void deleteAllEpics() {
         if (!epicStorage.isEmpty()) {
+            for (Task task : historyManager.getHistory()){
+               if (task instanceof Epic || task instanceof Subtask){
+                   historyManager.remove(task.getId());
+               }
+            }
             epicStorage.clear();
             subtaskStorage.clear();
         }
@@ -246,25 +255,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubtask(int id) {
-        if (!subtaskStorage.containsKey(id)) {
-            return;
+        if (subtaskStorage.containsKey(id)) {
+            int relatedEpicId = subtaskStorage.get(id).getEpicId();
+            Epic relatedEpic = epicStorage.get(relatedEpicId);
+            relatedEpic.deleteSubtask(id);
+            relatedEpic.setStatus(calculateEpicStatus(relatedEpic));
+            subtaskStorage.remove(id);
+            historyManager.remove(id);
         }
-        int relatedEpicId = subtaskStorage.get(id).getEpicId();
-        Epic relatedEpic = epicStorage.get(relatedEpicId);
-        relatedEpic.deleteSubtask(id);
-        relatedEpic.setStatus(calculateEpicStatus(relatedEpic));
-        subtaskStorage.remove(id);
     }
 
     @Override
     public void deleteAllSubtasks() {
-        if (subtaskStorage.isEmpty()) {
-            return;
-        }
-        subtaskStorage.clear();
-        for (Epic epic : epicStorage.values()) {
-            epic.clearSubtasksList();
-            epic.setStatus(calculateEpicStatus(epic));
+        if (!subtaskStorage.isEmpty()) {
+           for (Integer id : subtaskStorage.keySet()){
+                historyManager.remove(id);
+            }
+            subtaskStorage.clear();
+            for (Epic epic : epicStorage.values()) {
+                epic.clearSubtasksList();
+                epic.setStatus(calculateEpicStatus(epic));
+            }
         }
     }
 }

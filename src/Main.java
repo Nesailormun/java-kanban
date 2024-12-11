@@ -1,7 +1,4 @@
-import module.Epic;
-import module.Subtask;
-import module.Task;
-import module.TaskStatus;
+import module.*;
 import service.Manager;
 import service.TaskManager;
 
