@@ -1,7 +1,4 @@
-import module.Epic;
-import module.Subtask;
-import module.Task;
-import module.TaskStatus;
+import module.*;
 import service.Manager;
 import service.TaskManager;
 
@@ -20,11 +17,16 @@ public class Main {
         Epic epic1 = taskManager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         Epic epic2 = taskManager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
 
-        Subtask subtask1 = taskManager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1", epic1.getId()));
-        Subtask subtask2 = taskManager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2", epic1.getId()));
-        Subtask subtask3 = taskManager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3", epic1.getId()));
-        Subtask subtask4 = taskManager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4", epic2.getId()));
-        Subtask subtask5 = taskManager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5", epic2.getId()));
+        Subtask subtask1 = taskManager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
+                epic1.getId()));
+        Subtask subtask2 = taskManager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
+                epic1.getId()));
+        Subtask subtask3 = taskManager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
+                epic1.getId()));
+        Subtask subtask4 = taskManager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
+                epic2.getId()));
+        Subtask subtask5 = taskManager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
+                epic2.getId()));
 
         taskManager.getTaskById(task1.getId());
         taskManager.getTaskById(task2.getId());
@@ -43,6 +45,15 @@ public class Main {
 
         System.out.println(taskManager.getHistory());
 
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        System.out.println(taskManager.getHistory().size());
+        System.out.println(taskManager.getHistory());
+
+        taskManager.removeTask(task1.getId());
+        taskManager.removeTask(task2.getId());
+        System.out.println(taskManager.getHistory().size());
+        System.out.println(taskManager.getHistory());
     }
 }
 

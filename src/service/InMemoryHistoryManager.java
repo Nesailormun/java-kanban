@@ -1,29 +1,36 @@
 package service;
 
+import module.CustomLinkedHashMap;
 import module.Task;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final List<Task> taskHistoryStorage = new ArrayList<>(10);
+    CustomLinkedHashMap history = new CustomLinkedHashMap();
 
     @Override
-    public void add (Task task){
-        taskHistoryStorage.add(task);
-        controlSizeofTaskHistory();
+    public void add(Task task) {
+        if (history.getStorage().containsKey(task.getId())) {
+            history.removeNode(history.getStorage().get(task.getId()));
+        }
+        history.linkLast(task);
     }
 
     @Override
-    public List<Task> getHistory(){
-        if (taskHistoryStorage.isEmpty()) return new ArrayList<>();
-        return taskHistoryStorage;
+    public List<Task> getHistory() {
+        if (history.getStorage().isEmpty()) return new ArrayList<>();
+        return history.getTasks();
     }
 
-    private void controlSizeofTaskHistory(){
-        if (taskHistoryStorage.size() > 10){
-            taskHistoryStorage.removeFirst();
+    @Override
+    public void remove(int id) {
+        if (!history.getStorage().isEmpty()) {
+            if (history.getStorage().containsKey(id)) {
+                history.removeNode(history.getStorage().get(id));
+                history.getStorage().remove(id);
+            }
         }
     }
+
 }
