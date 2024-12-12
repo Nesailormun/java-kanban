@@ -45,6 +45,15 @@ public class Main {
 
         System.out.println(taskManager.getHistory());
 
+        taskManager.getTaskById(task1.getId());
+        taskManager.getTaskById(task2.getId());
+        System.out.println(taskManager.getHistory().size());
+        System.out.println(taskManager.getHistory());
+
+        taskManager.removeTask(task1.getId());
+        taskManager.removeTask(task2.getId());
+        System.out.println(taskManager.getHistory().size());
+        System.out.println(taskManager.getHistory());
     }
 }
 

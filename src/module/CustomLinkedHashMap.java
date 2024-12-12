@@ -37,25 +37,19 @@ public class CustomLinkedHashMap {
 
     public void removeNode(Node node) {
         if (node == null) return;
-        for (Node elem = head; elem != null; elem = elem.getNext()) {
-            if (node.getTask().equals(elem.getTask())) {
-                final Node next = elem.getNext();
-                final Node prev = elem.getPrev();
-                if (prev == null) {
-                    head = next;
-                } else {
-                    prev.setNext(next);
-                    elem.setPrev(null);
-                }
-
-                if (next == null) {
-                    tail = prev;
-                } else {
-                    next.setPrev(prev);
-                    elem.setNext(null);
-                }
-                elem.setTask(null);
-            }
+        Node next = node.getNext();
+        Node prev = node.getPrev();
+        if (prev == null) {
+            head = next;
+            if (head != null) head.setPrev(null);
+        } else {
+            prev.setNext(next);
+        }
+        if (next == null) {
+            tail = prev;
+            if (tail != null) tail.setNext(null);
+        } else {
+            next.setPrev(prev);
         }
     }
 }
