@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Epic extends Task {
 
     private final ArrayList<Integer> subtasksId = new ArrayList<>();
+    protected TaskType type = TaskType.EPIC;
 
     public Epic(String name, String description) {
         super(name, description);
@@ -33,12 +34,11 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "module.Epic{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", subtasksId=" + subtasksId +
-                '}';
+        return String.format("%d,%s,%s,%s,%s", id, type, name, status, description);
+    }
+
+    @Override
+    public TaskType getType(){
+        return TaskType.EPIC;
     }
 }

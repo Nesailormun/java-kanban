@@ -3,6 +3,7 @@ package module;
 public class Subtask extends Task {
 
     private final int epicId;
+    protected TaskType type = TaskType.SUBTASK;
 
     public Subtask(int id, String name, String description, TaskStatus status, int epicId) {
         super(id, name, description, status);
@@ -25,12 +26,11 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "module.Subtask{" +
-                "epicId=" + epicId +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return String.format("%d,%s,%s,%s,%s,%d", id, type, name, status, description, epicId);
+    }
+
+    @Override
+    public TaskType getType(){
+        return TaskType.SUBTASK;
     }
 }

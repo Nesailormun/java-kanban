@@ -8,6 +8,7 @@ public class Task {
     protected String name;
     protected String description;
     protected TaskStatus status;
+    protected TaskType type = TaskType.TASK;
 
     public Task(int id, String name, String description, TaskStatus status) {
         this.id = id;
@@ -77,11 +78,10 @@ public class Task {
 
     @Override
     public String toString() {
-        return "module.Task{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return String.format("%d,%s,%s,%s,%s", id, type, name, status, description);
+    }
+
+    public TaskType getType(){
+        return TaskType.TASK;
     }
 }
