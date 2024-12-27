@@ -81,7 +81,7 @@ public class Task {
         return String.format("%d,%s,%s,%s,%s", id, type, name, status, description);
     }
 
-    public TaskType getType(){
+    public TaskType getType() {
         return TaskType.TASK;
     }
 }

@@ -4,21 +4,92 @@ import exceptions.ManagerSaveException;
 import module.*;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private static final String HEAD = "id,type,name,status,description,epic";
     private static final String SEPARATE_LINE = "HISTORY:";
 
-    private Path path;
-
+    protected Path path;
 
     public FileBackedTaskManager(Path path) {
         this.path = path;
+    }
+
+    public static void main(String[] args) {
+        try {
+            File tempTestFile = File.createTempFile("tempTestFile", ".cvs");
+            FileBackedTaskManager manager = new FileBackedTaskManager(tempTestFile.toPath());
+
+            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
+            Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
+            Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW));
+            Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW));
+            Task task5 = manager.createTask(new Task("TASK5", "SOMETHINGTODO5", TaskStatus.NEW));
+
+            Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+            Epic epic2 = manager.createEpic(new Epic("EPIC2", "SOMEOFEPIC2"));
+
+            Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
+                    epic1.getId()));
+            Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
+                    epic1.getId()));
+            Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
+                    epic1.getId()));
+            Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
+                    epic2.getId()));
+            Subtask subtask5 = manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
+                    epic2.getId()));
+
+            manager.getTaskById(task1.getId());
+            manager.getTaskById(task2.getId());
+            manager.getTaskById(task3.getId());
+            manager.getTaskById(task4.getId());
+            manager.getTaskById(task5.getId());
+            manager.getSubtaskById(subtask1.getId());
+            manager.getSubtaskById(subtask2.getId());
+            manager.getSubtaskById(subtask3.getId());
+            manager.getSubtaskById(subtask4.getId());
+            manager.getSubtaskById(subtask5.getId());
+            manager.getTaskById(task1.getId());
+            manager.getTaskById(task2.getId());
+            manager.removeTask(task1.getId());
+            manager.removeTask(task2.getId());
+            manager.removeEpic(epic1.getId());
+            System.out.println("История просмотров тасков manager:");
+            System.out.println(manager.getHistory());
+            System.out.println();
+            System.out.println("Далее тестируем newManager, загруженный из файла");
+            // Восстанавливаем FileBackedTaskManager newManager из сохраненного файла и выполняем операции с ним
+            FileBackedTaskManager newManager = loadFromFile(tempTestFile);
+            System.out.println("История просмотров тасков newManager:");
+            System.out.println(newManager.getHistory());
+            System.out.println();
+            System.out.println(newManager.getAllSubtasks());
+            System.out.println(newManager.getAllTasks());
+            System.out.println(newManager.getAllEpics());
+            System.out.println(newManager.getEpicsSubtasks(newManager.epicStorage.get(6)));
+            System.out.println(newManager.epicStorage.get(7).getSubtasksId());
+            System.out.println(newManager.getHistory());
+            newManager.deleteAllTasks();
+            System.out.println(newManager.getAllEpics());
+            System.out.println(newManager.getAllSubtasks());
+            System.out.println(newManager.getHistory());
+
+            //После завершения выполнения инструкций содержание файла tempTestFile.cvs будет следующим:
+          /*id,type,name,status,description,epic
+            7,EPIC,EPIC2,NEW,SOMEOFEPIC2
+            11,SUBTASK,SUBTASK4,NEW,SOMEOFSUBTASK4,7
+            12,SUBTASK,SUBTASK5,NEW,SOMEOFSUBTASK5,7
+            HISTORY:
+            11,SUBTASK,SUBTASK4,NEW,SOMEOFSUBTASK4,7
+            12,SUBTASK,SUBTASK5,NEW,SOMEOFSUBTASK5,7*/
+
+
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка создания файла.");
+        }
     }
 
     public void save() {
@@ -44,41 +115,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     }
 
-    public static void main(String[] args) {
-
-        Path path = Paths.get("C:\\kirito\\projects\\testFile.txt");
-
-//        FileBackedTaskManager manager = new FileBackedTaskManager(path);
-//        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
-//        Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
-//        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW));
-//        Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW));
-//        Task task5 = manager.createTask(new Task("TASK5", "SOMETHINGTODO5", TaskStatus.NEW));
-//
-//        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
-//        Epic epic2 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
-//
-//        Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1", epic1.getId()));
-//        Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2", epic1.getId()));
-//        Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3", epic1.getId()));
-//        Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4", epic2.getId()));
-//        Subtask subtask5 = manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5", epic2.getId()));
-//
-//
-//        manager.getTaskById(task1.getId());
-//        manager.getTaskById(task2.getId());
-//        manager.getTaskById(task3.getId());
-//        manager.getTaskById(task4.getId());
-//        manager.getTaskById(task5.getId());
-//
-//        System.out.println(manager.getHistory());
-
-        FileBackedTaskManager newManager = loadFromFile(path.toFile());
-
-        System.out.println(newManager.getAllTasks());
-
-
-    }
 
     public Task fromString(String value) {
         String[] split = value.split(",");
@@ -90,12 +126,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case TASK:
                 task = new Task(Integer.parseInt(split[0]), split[2], split[4], status);
                 break;
-            case SUBTASK:
-                task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status, Integer.parseInt(split[5]));
-                break;
             case EPIC:
                 task = new Epic(Integer.parseInt(split[0]), split[2], split[4]);
                 task.setStatus(status);
+                break;
+            case SUBTASK:
+                task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status, Integer.parseInt(split[5]));
                 break;
             default:
                 throw new ManagerSaveException("Неизвестный тип данных.");
@@ -103,18 +139,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
-    public void read() {
+    public void readFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toString()))) {
             reader.readLine();
+            boolean isNotHistory = true;
             while (reader.ready()) {
                 String data = reader.readLine();
-                if (!data.equals(SEPARATE_LINE)) {
-                    if (data == null) {
-                        break;
-                    }
-                    if (data.isEmpty()) {
-                        break;
-                    }
+                if (data.isEmpty() || data.isBlank()) {
+                    break;
+                }
+                if (!data.equals(SEPARATE_LINE) && isNotHistory) {
                     Task task = fromString(data);
                     switch (task.getType()) {
                         case TASK:
@@ -125,10 +159,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             break;
                         case SUBTASK:
                             Subtask subtask = (Subtask) task;
-                            subtaskStorage.put(task.getId(),  subtask);
+                            subtaskStorage.put(task.getId(), subtask);
                             epicStorage.get(subtask.getEpicId()).addSubtask(subtask.getId());
                             break;
+                        default:
+                            throw new ManagerSaveException("Неизвестный тип данных.");
                     }
+                }
+                if (data.equals(SEPARATE_LINE)) {
+                    data = reader.readLine();
+                    isNotHistory = false;
+                }
+                if (!isNotHistory) {
+                    if (data == null)
+                        break;
+                    historyManager.add(fromString(data));
                 }
             }
         } catch (IOException e) {
@@ -140,7 +185,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager savedManager = new FileBackedTaskManager(file.toPath());
-        savedManager.read();
+        savedManager.readFile();
         return savedManager;
     }
 
