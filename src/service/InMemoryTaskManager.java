@@ -90,7 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return null;
         }
-        if ((epic.getId() == 0)) {
+        if (epic.getId() == 0) {
             epic.setId(taskId);
         }
         epic.setStatus(calculateEpicStatus(epic));

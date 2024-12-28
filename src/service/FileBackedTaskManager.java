@@ -60,11 +60,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println("История просмотров тасков manager:");
             System.out.println(manager.getHistory());
             System.out.println();
+            System.out.println("Все таски manager:");
+            System.out.println(manager.getAllTasks());
+            System.out.println();
             System.out.println("Далее тестируем newManager, загруженный из файла");
             // Восстанавливаем FileBackedTaskManager newManager из сохраненного файла и выполняем операции с ним
             FileBackedTaskManager newManager = loadFromFile(tempTestFile);
             System.out.println("История просмотров тасков newManager:");
             System.out.println(newManager.getHistory());
+            System.out.println();
+
+            Task task6 = newManager.createTask(new Task("TASK6", "SOMETHINGTODO6", TaskStatus.NEW));
+            System.out.println("Добавили task6 и вывели его id (должно быть 13)");
+            System.out.println(task6.getId());
+            Task task7 = newManager.createTask(new Task("TASK7", "SOMETHINGTODO7", TaskStatus.NEW));
+            System.out.println("Добавили task7 и вывели его id (должно быть 14)");
+            System.out.println(task7.getId());
             System.out.println();
             System.out.println(newManager.getAllSubtasks());
             System.out.println(newManager.getAllTasks());
@@ -77,7 +88,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println(newManager.getAllSubtasks());
             System.out.println(newManager.getHistory());
 
-            //После завершения выполнения инструкций содержание файла tempTestFile.cvs будет следующим:
+            //После завершения выполнения инструкций содержание файла tempTestFile.cvs должно быть следующим:
           /*id,type,name,status,description,epic
             7,EPIC,EPIC2,NEW,SOMEOFEPIC2
             11,SUBTASK,SUBTASK4,NEW,SOMEOFSUBTASK4,7
@@ -86,13 +97,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             11,SUBTASK,SUBTASK4,NEW,SOMEOFSUBTASK4,7
             12,SUBTASK,SUBTASK5,NEW,SOMEOFSUBTASK5,7*/
 
-
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка создания файла.");
         }
     }
 
-    public void save() {
+    protected void setNewMaxTaskId(int newId) {
+        taskId = newId + 1;
+    }
+
+    protected void save() {
         try (FileWriter fileWriter = new FileWriter(path.toString())) {
             fileWriter.write(HEAD + "\n");
 
@@ -116,7 +130,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
 
-    public Task fromString(String value) {
+    protected Task fromString(String value) {
         String[] split = value.split(",");
         TaskType type = TaskType.valueOf(split[1]);
         TaskStatus status = TaskStatus.valueOf(split[3]);
@@ -139,10 +153,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
-    public void readFile() {
+    protected void readFile() {
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toString()))) {
             reader.readLine();
             boolean isNotHistory = true;
+            int maxId = 1;
             while (reader.ready()) {
                 String data = reader.readLine();
                 if (data.isEmpty() || data.isBlank()) {
@@ -153,13 +168,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     switch (task.getType()) {
                         case TASK:
                             taskStorage.put(task.getId(), task);
+                            maxId = Integer.max(task.getId(), maxId);
                             break;
                         case EPIC:
                             epicStorage.put(task.getId(), (Epic) task);
+                            maxId = Integer.max(task.getId(), maxId);
                             break;
                         case SUBTASK:
                             Subtask subtask = (Subtask) task;
                             subtaskStorage.put(task.getId(), subtask);
+                            maxId = Integer.max(task.getId(), maxId);
                             epicStorage.get(subtask.getEpicId()).addSubtask(subtask.getId());
                             break;
                         default:
@@ -176,10 +194,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     historyManager.add(fromString(data));
                 }
             }
+            setNewMaxTaskId(maxId);
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка чтения данных из файла.");
         }
-
     }
 
 
@@ -188,6 +206,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         savedManager.readFile();
         return savedManager;
     }
+
 
     @Override
     public Task createTask(Task task) {
@@ -199,7 +218,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Epic createEpic(Epic epic) {
-
         Epic newEpic = super.createEpic(epic);
         save();
         return newEpic;

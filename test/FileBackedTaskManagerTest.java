@@ -31,7 +31,6 @@ public class FileBackedTaskManagerTest {
     void loadFromAndSaveEmptyFile() {
         FileBackedTaskManager managerLoadedFromFile = FileBackedTaskManager.loadFromFile(tempTestFile);
         assertNotNull(managerLoadedFromFile);
-        managerLoadedFromFile.save();
         assertTrue(managerLoadedFromFile.getHistory().isEmpty(), "История должна быть пустой");
     }
 
