@@ -14,9 +14,7 @@ public interface TaskManager {
 
     Task getTaskById(int id);
 
-
     Task createTask(Task task);
-
 
     void updateTask(Task task);
 
@@ -25,7 +23,6 @@ public interface TaskManager {
     void deleteAllTasks();
 
     List<Task> getAllTasks();
-
 
     // Beginning of module.Epic methods:
 
@@ -43,7 +40,6 @@ public interface TaskManager {
 
 
     List<Subtask> getEpicsSubtasks(Epic epic);
-
 
     // Beginning of module.Subtask methods:
 

@@ -25,12 +25,11 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "module.Subtask{" +
-                "epicId=" + epicId +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        return String.format("%d,%s,%s,%s,%s,%d", id, getType(), name, status, description, epicId);
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 }
