@@ -3,10 +3,9 @@ package service;
 import module.*;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -22,69 +21,92 @@ public class InMemoryTaskManager implements TaskManager {
             return 1;
         if (task2.getStartTime() == null)
             return -1;
-        if (task1.getStartTime().isBefore(task2.getStartTime())) {
-            return -1;
-        } else if (task1.getStartTime().isAfter(task2.getStartTime())) {
-            return 1;
-        } else {
-            return task1.getId() - task2.getId();
-        }
+        int timeComparison = task1.getStartTime().compareTo(task2.getStartTime());
+        if (timeComparison != 0)
+            return timeComparison; // Сравнение по времени
+        return Integer.compare(task1.getId(), task2.getId());
     });
 
 
     public static void main(String[] args) {
         InMemoryTaskManager manager = new InMemoryTaskManager();
 
-//        Task task1 = manager.createTask(new Task("TASK1NODATETIME", "SOMETHINGTODO1", TaskStatus.NEW));
-//        Task task2 = manager.createTask(new Task("TASK2NODATETIME", "SOMETHINGTODO2", TaskStatus.NEW));
-//        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
-//                TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
-//        Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4",
-//                TaskStatus.NEW, LocalDateTime.now().plus(Duration.ofMinutes(90)), Duration.ofMinutes(50)));
-//        Task task5 = manager.createTask(null);
-//        Task task6 = manager.createTask(new Task("TASK6", "SOMETHINGTODO6",
-//                TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(51)), Duration.ofMinutes(50)));
-//
-//        System.out.println(manager.getPrioritizedTasks());
-//        System.out.println(manager.getAllTasks());
-//        System.out.println();
-//        manager.updateTask(new Task(task3.getId(), "TASK7", "SOMETHINGTODO7",
-//                TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(141)), Duration.ofMinutes(50)));
-//        manager.updateTask(new Task("WRONGUPDATETASK", "WRONG"));
-//
-//        System.out.println(manager.getPrioritizedTasks());
-//        System.out.println(manager.getAllTasks());
-//        manager.removeTask(task6.getId());
-//        System.out.println();
-//        System.out.println(manager.getPrioritizedTasks());
-//        System.out.println(manager.getAllTasks());
-//
-//        manager.deleteAllTasks();
-//        System.out.println();
-//        System.out.println(manager.getPrioritizedTasks());
-//        System.out.println(manager.getAllTasks());
-//        Task task24 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
-//                TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
-//        System.out.println(manager.getPrioritizedTasks());
-//        System.out.println(manager.getAllTasks());
+        Task task1 = manager.createTask(new Task("TASK1NODATETIME", "SOMETHINGTODO1", TaskStatus.NEW));
+        Task task2 = manager.createTask(new Task("TASK2NODATETIME", "SOMETHINGTODO2", TaskStatus.NEW));
+        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
+                TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
+        Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4",
+                TaskStatus.NEW, LocalDateTime.now().plus(Duration.ofMinutes(90)), Duration.ofMinutes(50)));
+        Task task5 = manager.createTask(null);
+        Task task6 = manager.createTask(new Task("TASK6", "SOMETHINGTODO6",
+                TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(51)), Duration.ofMinutes(50)));
+
+        System.out.println(manager.getPrioritizedTasks());
+        System.out.println(manager.getAllTasks());
+        System.out.println();
+        manager.updateTask(new Task(task3.getId(), "TASK7", "SOMETHINGTODO7",
+                TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(141)), Duration.ofMinutes(50)));
+        manager.updateTask(new Task("WRONGUPDATETASK", "WRONG"));
+
+        System.out.println(manager.getPrioritizedTasks());
+        System.out.println(manager.getAllTasks());
+        manager.removeTask(task6.getId());
+        System.out.println();
+        System.out.println(manager.getPrioritizedTasks());
+        System.out.println(manager.getAllTasks());
+
+        manager.deleteAllTasks();
+        System.out.println();
+        System.out.println(manager.getPrioritizedTasks());
+        System.out.println(manager.getAllTasks());
+        Task task24 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
+                TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
+        System.out.println(manager.getPrioritizedTasks());
+        System.out.println(manager.getAllTasks());
 
         System.out.println();
         System.out.println("------EPIC TEST-------");
-        Epic epic1 = manager.createEpic(new Epic("EPIC1", "DEPIC2"));
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "DEPIC1"));
         Epic epic2 = manager.createEpic(new Epic("EPIC2", "DEPIC2"));
-        Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1","DSUBTASK1", epic1.getId(),
-                LocalDateTime.now(), Duration.ofMinutes(10)));
-        Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2","DSUBTASK2", epic1.getId(),
-                LocalDateTime.now(), Duration.ofMinutes(20)));
-        Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3","DSUBTASK3", epic1.getId()));
-        Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4","DSUBTASK4", epic2.getId(),
-                LocalDateTime.now().minusMinutes(20), Duration.ofMinutes(15)));
+        Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "DSUBTASK1", epic1.getId(),
+                LocalDateTime.of(2025, 1, 27, 10, 0), Duration.ofMinutes(10)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "DSUBTASK2", epic1.getId(),
+                subtask1.getStartTime().plusMinutes(10), Duration.ofMinutes(20)));
+        Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "DSUBTASK3", epic1.getId()));
+        Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "DSUBTASK4", epic2.getId(),
+                subtask1.getStartTime().minusMinutes(20), Duration.ofMinutes(15)));
 
+        System.out.println("-------ВЫВОД ПРИОРИТЕТНЫХ ЗАДАЧ----------");
         System.out.println(manager.getPrioritizedTasks());
 
-        manager.updateSubtask(new Subtask(subtask2.getId(),"NEWSUBTASK2", "DNEWSUBTASK2",
-                TaskStatus.IN_PROGRESS, epic1.getId(), subtask4.getStartTime().minusMinutes(40), Duration.ofMinutes(20)));
+        System.out.println("--ПРОВЕРКА ОБНОВЛЕНИЯ САБТАСКА И СООТВЕТСТВУЮЩЕГО ЭПИКА---");
+        manager.updateSubtask(new Subtask(subtask2.getId(), "NEWSUBTASK2", "DNEWSUBTASK2",
+                TaskStatus.IN_PROGRESS, epic1.getId(),subtask1.getStartTime().plusMinutes(30), subtask2.getDuration()));
+        manager.updateSubtask(new Subtask(subtask4.getId(), "NEWSUBTASK4", "DNEWSUBTASK4",
+                TaskStatus.DONE, epic2.getId(), subtask1.getStartTime().minusMinutes(60), subtask4.getDuration()));
+        manager.updateSubtask(new Subtask(subtask3.getId(), "NEWSUBTASK3", "DNEWSUBTASK3",
+                TaskStatus.NEW, epic1.getId(), subtask1.getStartTime().plusMinutes(60), Duration.ofMinutes(20)));
 
+
+        System.out.println(manager.getAllSubtasks());
+        System.out.println(manager.getAllEpics());
+        System.out.println(manager.getPrioritizedTasks());
+        System.out.println();
+        System.out.println("------ПРОВЕРКА УДАЛЕНИЯ САБТАСКОВ Subtask4 и Subtask1---------");
+
+        manager.removeSubtask(subtask4.getId());
+        manager.removeSubtask(subtask1.getId());
+        System.out.println(manager.getPrioritizedTasks());
+
+        System.out.println();
+        System.out.println("------ПРОВЕРКА УДАЛЕНИЯ ВСЕХ САБТАСКОВ---------");
+
+        manager.deleteAllSubtasks();
+        System.out.println(manager.getPrioritizedTasks());
+
+        System.out.println();
+        System.out.println("------ПРОВЕРКА УДАЛЕНИЯ ВСЕХ ЭПИКОВ---------");
+        manager.deleteAllEpics();
         System.out.println(manager.getPrioritizedTasks());
     }
 
@@ -98,6 +120,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         if (taskStorage.containsKey(id)) {
+            if (taskStorage.get(id) == null)
+                return null;
             historyManager.add(taskStorage.get(id));
             return taskStorage.get(id);
         }
@@ -115,9 +139,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (task.getStatus() == null) {
             task.setStatus(TaskStatus.NEW);
         }
+        if (!isValid(task))
+            return null;
         taskStorage.put(task.getId(), task);
-        if (validateDateTime(task))
-            prioritizedTasks.add(task);
+        prioritizedTasks.add(task);
         taskId++;
         return task;
     }
@@ -127,18 +152,20 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return;
         }
+        if (!isValid(task))
+            return;
         if (taskStorage.containsKey(task.getId())) {
             taskStorage.put(task.getId(), task);
-            if (validateDateTime(task)) {
-                prioritizedTasks.remove(taskStorage.get(task.getId()));
-                prioritizedTasks.add(task);
-            }
+            prioritizedTasks.remove(taskStorage.get(task.getId()));
+            prioritizedTasks.add(task);
         }
     }
 
     @Override
     public void removeTask(int id) {
         if (taskStorage.containsKey(id)) {
+            if (taskStorage.get(id) == null)
+                return;
             prioritizedTasks.remove(taskStorage.get(id));
             taskStorage.remove(id);
             historyManager.remove(id);
@@ -276,9 +303,8 @@ public class InMemoryTaskManager implements TaskManager {
             for (int id : epic.getSubtasksId()) {
                 subtasks.add(subtaskStorage.get(id));
             }
-            return subtasks;
         }
-        return null;
+        return subtasks;
     }
 
     // Beginning of module.Subtask methods:
@@ -298,13 +324,16 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask.getStatus() == null) {
             subtask.setStatus(TaskStatus.NEW);
         }
-        if (validateDateTime(subtask))
-            prioritizedTasks.add(subtask);
+        if (!isValid(subtask))
+            return null;
+        prioritizedTasks.add(subtask);
         Epic epic = epicStorage.get(idOfEpic);
+        prioritizedTasks.remove(epic);
         epic.addSubtask(subtask.getId());
         subtaskStorage.put(subtask.getId(), subtask);
         calculateEpicDateTime(epic);
         epic.setStatus(calculateEpicStatus(epic));
+        prioritizedTasks.add(epic);
         taskId++;
         return subtask;
     }
@@ -318,27 +347,32 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subtaskStorage.containsKey(subtask.getId())) {
             return;
         }
+        int subtaskId = subtask.getId();
+        Subtask oldSubtask = subtaskStorage.get(subtaskId);
         int subtaskEpicId = subtask.getEpicId();
         if (!epicStorage.containsKey(subtaskEpicId)) {
             return;
         }
         Epic epic = epicStorage.get(subtaskEpicId);
-        ArrayList<Integer> epicSubtaskList = epic.getSubtasksId();
-        if (!epicSubtaskList.contains(subtask.getId())) {
+        if (!epic.getSubtasksId().contains(subtask.getId())) {
             return;
         }
-        if (validateDateTime(subtask)) {
-            prioritizedTasks.remove(subtaskStorage.get(subtask.getId()));
-            prioritizedTasks.add(subtask);
-        }
-        subtaskStorage.put(subtask.getId(), subtask);
+        if (!isValid(subtask))
+            return;
+        prioritizedTasks.remove(epic);
+        prioritizedTasks.remove(oldSubtask);
+        subtaskStorage.put(subtaskId, subtask);
+        prioritizedTasks.add(subtask);
         calculateEpicDateTime(epic);
         epic.setStatus(calculateEpicStatus(epic));
+        prioritizedTasks.add(epic);
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
         if (subtaskStorage.containsKey(id)) {
+            if (subtaskStorage.get(id) == null)
+                return null;
             historyManager.add(subtaskStorage.get(id));
             return subtaskStorage.get(id);
         }
@@ -356,12 +390,17 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtask(int id) {
         if (subtaskStorage.containsKey(id)) {
+            if (taskStorage.get(id) == null)
+                return;
             int relatedEpicId = subtaskStorage.get(id).getEpicId();
             Epic relatedEpic = epicStorage.get(relatedEpicId);
+            prioritizedTasks.remove(relatedEpic);
+            prioritizedTasks.remove(subtaskStorage.get(id));
             relatedEpic.deleteSubtask(id);
             subtaskStorage.remove(id);
             calculateEpicDateTime(relatedEpic);
             relatedEpic.setStatus(calculateEpicStatus(relatedEpic));
+            prioritizedTasks.add(relatedEpic);
             historyManager.remove(id);
         }
     }
@@ -375,9 +414,11 @@ public class InMemoryTaskManager implements TaskManager {
             }
             subtaskStorage.clear();
             for (Epic epic : epicStorage.values()) {
+                prioritizedTasks.remove(epic);
                 epic.clearSubtasksList();
                 calculateEpicDateTime(epic);
                 epic.setStatus(calculateEpicStatus(epic));
+                prioritizedTasks.add(epic);
             }
         }
     }
@@ -395,11 +436,11 @@ public class InMemoryTaskManager implements TaskManager {
 //            return 1;
 //    };
 
-    public void calculateEpicDateTime(Epic epic) {
+    protected void calculateEpicDateTime(Epic epic) {
+        epic.setDuration(Duration.ofMinutes(0));
+        epic.setStartTime(null);
+        epic.setEndTime(null);
         if (epic.getSubtasksId().isEmpty()) {
-            epic.setStartTime(null);
-            epic.setDuration(null);
-            epic.setEndTime(null);
             return;
         }
         LocalDateTime subtaskStartTime;
@@ -415,6 +456,10 @@ public class InMemoryTaskManager implements TaskManager {
                     epic.setDuration(subtaskDuration);
                     epic.setEndTime(subtaskEndTime);
                     return;
+                }
+                if (epic.getStartTime() == null){
+                    epic.setStartTime(subtaskStartTime);
+                    epic.setEndTime(subtaskEndTime);
                 }
                 epic.setDuration(epic.getDuration().plus(subtaskDuration));
                 if (subtaskStartTime.isBefore(epic.getStartTime())) {
@@ -440,19 +485,20 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    protected boolean validateDateTime(Task task) {
+    protected boolean isValid(Task task) {
         if (prioritizedTasks.isEmpty())
             return true;
         if (task.getStartTime() == null)
             return true;
+
         return prioritizedTasks
                 .stream()
                 .filter(priorityTask -> priorityTask.getStartTime() != null)
                 .filter(priorityTask -> priorityTask.getStartTime().isEqual(task.getStartTime())
-                                || (priorityTask.getStartTime().isBefore(task.getStartTime())
-                                && priorityTask.getEndTime().isAfter(task.getStartTime()))
-                                || (priorityTask.getStartTime().isAfter(task.getStartTime())
-                                && priorityTask.getStartTime().isBefore(task.getEndTime())))
+                        || (priorityTask.getStartTime().isBefore(task.getStartTime())
+                        && priorityTask.getEndTime().isAfter(task.getStartTime()))
+                        || (priorityTask.getStartTime().isAfter(task.getStartTime())
+                        && priorityTask.getStartTime().isBefore(task.getEndTime())))
                 .findFirst()
                 .isEmpty();
 

@@ -45,7 +45,11 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,%d", id, getType(), name, status, description, epicId);
+        if (startTime == null)
+            return String.format("%d,%s,%s,%s,%s,%d", id, getType(), name, status, description, epicId);
+        return String.format("%d,%s,%s,%s,%s,%s,%d,%d", id, getType(), name, status, description, startTime,
+                getDuration().toMinutes(), epicId);
+
     }
 
     @Override
