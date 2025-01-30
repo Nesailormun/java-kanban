@@ -3,9 +3,9 @@ import module.Subtask;
 import module.Task;
 import module.TaskStatus;
 import service.TaskManager;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -14,8 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
 abstract class TaskManagerTest<T extends TaskManager> {
 
     protected T manager;
-
-    abstract void initiateManager();
 
     @Test
     void getHistory() {
@@ -52,6 +50,8 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 start, duration));
         Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW,
                 start.plusMinutes(30), duration));
+        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW,
+                start.plusMinutes(30), duration));
         assertEquals(2, manager.getAllTasks().size(), "Ошибка создания тасков");
     }
 
@@ -84,7 +84,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void deleteAllTasks(){
+    void deleteAllTasks() {
         LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
         Duration duration = Duration.ofMinutes(30);
         Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
@@ -95,7 +95,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(manager.getAllTasks().isEmpty());
     }
 
-    void getAllTasks(){
+    void getAllTasks() {
         LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
         Duration duration = Duration.ofMinutes(30);
         Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
@@ -109,7 +109,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     // Beginning of module.Epic Tests:
     @Test
-    void createEpic(){
+    void createEpic() {
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         Epic epic2 = manager.createEpic(new Epic("EPIC2", "SOMEOFEPIC2"));
         assertNotNull(epic1);
@@ -118,7 +118,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void updateEpic(){
+    void updateEpic() {
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         manager.updateEpic(new Epic(1, "NEWEPIC1", "SOMENEWEPIC1"));
         assertEquals("NEWEPIC1", manager.getEpicById(epic1.getId()).getName());
@@ -126,39 +126,124 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void getEpicById(){
+    void getEpicById() {
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         assertEquals(manager.getEpicById(epic1.getId()), epic1);
         assertNull(manager.getEpicById(24));
     }
 
     @Test
-    void getAllEpics(){
+    void getAllEpics() {
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         assertEquals(1, manager.getAllEpics().size());
     }
 
     @Test
-    void removeEpic(){
-
+    void removeEpic() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", epic1.getId(),
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        manager.removeEpic(epic1.getId());
+        assertEquals(0, manager.getAllEpics().size());
+        assertEquals(0, manager.getAllSubtasks().size());
     }
 
-    void deleteAllEpics();
+    @Test
+    void deleteAllEpics() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Epic epic2 = manager.createEpic(new Epic("EPIC2", "SOMEOFEPIC2"));
+        manager.deleteAllEpics();
+        assertEquals(0, manager.getAllEpics().size());
+    }
 
-
-    List<Subtask> getEpicsSubtasks(Epic epic);
+    @Test
+    void getEpicsSubtasks() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", epic1.getId(),
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", epic1.getId(),
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        Epic epic2 = manager.createEpic(new Epic("EPIC2", "SOMEOFEPIC2"));
+        assertEquals(2, manager.getEpicsSubtasks(epic1).size());
+        assertEquals(0, manager.getEpicsSubtasks(epic2).size());
+    }
 
     // Beginning of module.Subtask methods:
+    @Test
+    void createSubtask() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "SomeSubtask3", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask4 = manager.createSubtask(new Subtask("Subtask4", "SomeSubtask4", 12,
+                subtask1.getStartTime().plusMinutes(60), Duration.ofMinutes(20)));
+        assertEquals(2, manager.getAllSubtasks().size());
+    }
 
-    Subtask createSubtask(Subtask subtask);
+    @Test
+    void updateSubtask() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "SomeSubtask3", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        assertEquals(2, manager.getAllSubtasks().size());
 
-    void updateSubtask(Subtask subtask);
+        manager.updateSubtask(new Subtask(2, "NEWSUBTASK3", "SOMESUBTASK4", TaskStatus.IN_PROGRESS,
+                epic1.getId(), subtask1.getStartTime().plusMinutes(40), subtask1.getDuration()));
+        assertEquals(2, manager.getAllSubtasks().size());
+        assertEquals(TaskStatus.IN_PROGRESS, epic1.getStatus());
+    }
 
-    Subtask getSubtaskById(int id);
+    @Test
+    void getSubtaskById() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        assertEquals(subtask1, manager.getSubtaskById(subtask1.getId()));
+        assertNotEquals(subtask2, manager.getSubtaskById(subtask1.getId()));
+        assertNull(manager.getSubtaskById(123));
+    }
 
-    List<Subtask> getAllSubtasks();
+    @Test
+    void getAllSubtasks() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        assertEquals(2, manager.getAllSubtasks().size());
+    }
 
-    void removeSubtask(int id);
+    @Test
+    void removeSubtask() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        manager.removeSubtask(subtask1.getId());
+        assertEquals(1, manager.getAllSubtasks().size());
+        manager.removeSubtask(subtask1.getId());
+        manager.removeSubtask(subtask2.getId());
+        assertEquals(0, manager.getAllSubtasks().size());
+    }
 
-    void deleteAllSubtasks();
+    @Test
+    void deleteAllSubtasks() {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                LocalDateTime.now(), Duration.ofMinutes(20)));
+        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+        manager.deleteAllSubtasks();
+        assertEquals(0, manager.getEpicsSubtasks(epic1).size());
+    }
 }

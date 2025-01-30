@@ -82,7 +82,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println();
             System.out.println("-----Обновляем сабтаск5 И вновь выводим список priority-----");
             manager.updateSubtask(new Subtask(subtask5.getId(), "SUBTASK5", "SOMEOFSUBTASK5",
-                    TaskStatus.DONE, epic2.getId(), start.minusMinutes(210),duration));
+                    TaskStatus.DONE, epic2.getId(), start.minusMinutes(210), duration));
             System.out.println(manager.getPrioritizedTasks());
             System.out.println();
 
@@ -148,7 +148,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case TASK:
                 if (split.length > 5) {
                     task = new Task(Integer.parseInt(split[0]), split[2], split[4], status,
-                             LocalDateTime.parse(split[5]), Duration.ofMinutes(Integer.parseInt(split[6])));
+                            LocalDateTime.parse(split[5]), Duration.ofMinutes(Integer.parseInt(split[6])));
                 } else {
                     task = new Task(Integer.parseInt(split[0]), split[2], split[4], status);
                 }
@@ -165,7 +165,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             case SUBTASK:
                 if (split.length > 6) {
                     task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status,
-                             Integer.parseInt(split[7]), LocalDateTime.parse(split[5]),
+                            Integer.parseInt(split[7]), LocalDateTime.parse(split[5]),
                             Duration.ofMinutes(Integer.parseInt(split[6])));
                 } else
                     task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status,

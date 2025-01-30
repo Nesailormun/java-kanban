@@ -6,14 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import module.*;
 import exceptions.ManagerSaveException;
 import service.FileBackedTaskManager;
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-    FileBackedTaskManager manager;
     File tempTestFile;
 
     @BeforeEach
@@ -36,16 +38,20 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void writeInEmptyFile() {
-        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
-        Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
+        LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+        Duration duration = Duration.ofMinutes(30);
+        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
+                start, duration));
+        Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2",
+                TaskStatus.NEW, start.minusMinutes(30), duration));
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         Epic epic2 = manager.createEpic(new Epic("EPIC2", "SOMEOFEPIC2"));
         Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
-                epic1.getId()));
+                epic1.getId(), start.minusMinutes(60), duration));
         Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
-                epic1.getId()));
+                epic1.getId(), start.minusMinutes(90), duration));
         Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
-                epic2.getId()));
+                epic2.getId(), start.minusMinutes(180), duration));
 
         assertTrue(manager.getHistory().isEmpty(), "История должна быть пустой");
         assertEquals(task1, manager.getTaskById(task1.getId()), "Таски не равны");
@@ -59,13 +65,24 @@ public class FileBackedTaskManagerTest {
 
     @Test
     void testTwoDifferentManagersFromSameFile() {
-        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
-        Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
+        LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+        Duration duration = Duration.ofMinutes(30);
+        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
+                start, duration));
+        Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2",
+                TaskStatus.NEW, start.minusMinutes(30), duration));
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
-                epic1.getId()));
+                epic1.getId(), start.minusMinutes(60), duration));
         Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
-                epic1.getId()));
+                epic1.getId(), start.minusMinutes(90), duration));
+
+        assertTrue(manager.getPrioritizedTasks()
+                .stream()
+                .map(Task::getId)
+                .allMatch(List.of(epic1.getId(), subtask2.getId(), subtask1.getId(),
+                        task2.getId(), task1.getId())::contains), "Неккоректная запись списка задач в порядке" +
+                " приоритета.");
 
         FileBackedTaskManager newManager = FileBackedTaskManager.loadFromFile(tempTestFile);
         assertTrue(newManager.getHistory().isEmpty(), "История просмотров должна быть пустой");
@@ -81,6 +98,13 @@ public class FileBackedTaskManagerTest {
                 "Некорректное сохранение сабтасков");
         assertEquals(manager.getHistory().size(), newManager.getHistory().size(),
                 "Некорректное сохранение истории просмотров тасков");
+        assertEquals(manager.getPrioritizedTasks(), newManager.getPrioritizedTasks());
+    }
+
+    @Test
+    void testThrowingIOException() {
+        assertThrows(ManagerSaveException.class, () -> FileBackedTaskManager.loadFromFile(new File("ERROR")));
+        assertDoesNotThrow(() -> FileBackedTaskManager.loadFromFile(tempTestFile));
     }
 
     @AfterEach

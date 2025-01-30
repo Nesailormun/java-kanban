@@ -57,13 +57,13 @@ public class Task {
     }
 
 
-    public LocalDateTime getEndTime(){
+    public LocalDateTime getEndTime() {
         if (startTime == null)
             return null;
         return startTime.plus(duration);
     }
 
-    public void setStartTime(LocalDateTime startTime){
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 

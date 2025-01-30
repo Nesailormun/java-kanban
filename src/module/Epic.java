@@ -2,7 +2,7 @@ package module;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Formatter;
+
 
 public class Epic extends Task {
 
@@ -36,11 +36,11 @@ public class Epic extends Task {
 
 
     @Override
-    public LocalDateTime getEndTime(){
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(LocalDateTime endTime){
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 

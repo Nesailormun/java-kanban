@@ -1,6 +1,7 @@
 package service;
 
 import module.Task;
+
 import java.util.List;
 
 public interface HistoryManager {
