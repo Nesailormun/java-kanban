@@ -312,30 +312,32 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
         assertEquals(task3, manager.getPrioritizedTasks().getFirst(), "Неверный порядок " +
                 "в приоритетном списке тасков после добавления epic1, subtask1, subtask2" +
-                " (correct: task3, task2, task1, epic1, subtask1, subtask2)");
+                " (correct: task3, task2, task1, subtask1, subtask2)");
         assertEquals(subtask2, manager.getPrioritizedTasks().getLast(), "Неверный порядок " +
                 "в приоритетном списке тасков после добавления epic1, subtask1, subtask2" +
-                " (correct: task3, task2, task1, epic1, subtask1, subtask2)");
-        assertEquals(6, manager.getPrioritizedTasks().size(), "Ошибка добавления тасков в" +
+                " (correct: task3, task2, task1, subtask1, subtask2)");
+        assertEquals(5, manager.getPrioritizedTasks().size(), "Ошибка добавления тасков в" +
                 " prioritizedTasks");
 
-        manager.updateSubtask(new Subtask(subtask1.getId(), "NEWSUBTASK1", "SOMTHINGGOOD",
-                TaskStatus.DONE, epic1.getId(), start.minusMinutes(180), duration30Min));
-        assertEquals(epic1, manager.getPrioritizedTasks().getFirst(), "Неверный порядок " +
-                "в приоритетном списке Тасков после изменения subtask1 (correct: epic1, subtask1, task3, task2," +
+        Subtask newSubtask1 = new Subtask(subtask1.getId(), "NEWSUBTASK1", "SOMTHINGGOOD",
+                TaskStatus.DONE, epic1.getId(), start.minusMinutes(180), duration30Min);
+        manager.updateSubtask(newSubtask1);
+
+        assertEquals(newSubtask1, manager.getPrioritizedTasks().getFirst(), "Неверный порядок " +
+                "в приоритетном списке Тасков после изменения subtask1 (correct:  subtask1, task3, task2," +
                 " task1, subtask2)");
         assertEquals(subtask2, manager.getPrioritizedTasks().getLast(), "Неверный порядок " +
-                "в приоритетном списке Тасков после изменения subtask1 (correct: epic1, subtask1, task3, task2," +
+                "в приоритетном списке Тасков после изменения subtask1 (correct:  subtask1, task3, task2," +
                 " task1, subtask2)");
 
         manager.removeSubtask(subtask2.getId());
-        assertEquals(epic1, manager.getPrioritizedTasks().getFirst(), "Неверный порядок " +
-                "в приоритетном списке Тасков после изменения subtask1 (correct: epic1, subtask1, task3, task2," +
+        assertEquals(newSubtask1, manager.getPrioritizedTasks().getFirst(), "Неверный порядок " +
+                "в приоритетном списке Тасков после изменения subtask1 (correct: subtask1, task3, task2," +
                 " task1)");
         assertEquals(task1, manager.getPrioritizedTasks().getLast(), "Неверный порядок " +
-                "в приоритетном списке Тасков после изменения subtask1 (correct: epic1, subtask1, task3, task2," +
+                "в приоритетном списке Тасков после изменения subtask1 (correct: subtask1, task3, task2," +
                 " task1)");
-        assertEquals(5, manager.getPrioritizedTasks().size(), "Ошибка удаления subtask2 из списка");
+        assertEquals(4, manager.getPrioritizedTasks().size(), "Ошибка удаления subtask2 из списка");
 
         manager.deleteAllEpics();
         assertEquals(task3, manager.getPrioritizedTasks().getFirst(), "Неверный порядок " +
@@ -344,6 +346,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 "в приоритетном списке тасков после удаления эпика (correct: task3, task2, task1)");
         assertEquals(3, manager.getPrioritizedTasks().size(), "Ошибка удаления тасков в" +
                 " prioritizedTasks");
+
     }
 
 }
