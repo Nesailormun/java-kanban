@@ -5,11 +5,14 @@ import module.*;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private static final String HEAD = "id,type,name,status,description,epic";
-    private static final String SEPARATE_LINE = "HISTORY:";
+    private static final String HEAD = "id,type,name,status,description,localdatetime,duration,epic,";
+    private static final String HISTORY_LINE = "HISTORY:";
+    private static final String PRIORITIZED_TASKS = "PRIORITIZED_TASKS";
 
     protected Path path;
 
@@ -21,29 +24,39 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try {
             File tempTestFile = File.createTempFile("tempTestFile", ".cvs");
             FileBackedTaskManager manager = new FileBackedTaskManager(tempTestFile.toPath());
+            LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+            Duration duration = Duration.ofMinutes(30);
 
-            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
-            Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
-            Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW));
-            Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW));
+            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW, start,
+                    duration));
+            Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW, start,
+                    duration));
+            Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW,
+                    start.plusMinutes(30), duration));
+            Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW,
+                    start.plusMinutes(60), duration));
             Task task5 = manager.createTask(new Task("TASK5", "SOMETHINGTODO5", TaskStatus.NEW));
+
 
             Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
             Epic epic2 = manager.createEpic(new Epic("EPIC2", "SOMEOFEPIC2"));
 
             Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
-                    epic1.getId()));
+                    epic1.getId(), start.minusMinutes(180), duration));
             Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
-                    epic1.getId()));
+                    epic1.getId(), start.minusMinutes(120), duration));
             Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
-                    epic1.getId()));
+                    epic1.getId(), start.minusMinutes(60), duration));
             Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
                     epic2.getId()));
             Subtask subtask5 = manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
                     epic2.getId()));
 
+            System.out.println("-----Получаем список в порядке приоритета-----");
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println();
+
             manager.getTaskById(task1.getId());
-            manager.getTaskById(task2.getId());
             manager.getTaskById(task3.getId());
             manager.getTaskById(task4.getId());
             manager.getTaskById(task5.getId());
@@ -53,49 +66,39 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             manager.getSubtaskById(subtask4.getId());
             manager.getSubtaskById(subtask5.getId());
             manager.getTaskById(task1.getId());
-            manager.getTaskById(task2.getId());
-            manager.removeTask(task1.getId());
-            manager.removeTask(task2.getId());
-            manager.removeEpic(epic1.getId());
+            manager.getEpicById(epic1.getId());
+            manager.getEpicById(epic2.getId());
+
+//            manager.removeEpic(epic1.getId());
             System.out.println("История просмотров тасков manager:");
             System.out.println(manager.getHistory());
             System.out.println();
-            System.out.println("Все таски manager:");
+            manager.removeTask(task1.getId());
+            System.out.println("Все таски manager после удаления task1:");
             System.out.println(manager.getAllTasks());
             System.out.println();
+            System.out.println("-----Получаем список в порядке приоритета-----");
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println();
+            System.out.println("-----Обновляем сабтаск5 И вновь выводим список priority-----");
+            manager.updateSubtask(new Subtask(subtask5.getId(), "SUBTASK5", "SOMEOFSUBTASK5",
+                    TaskStatus.DONE, epic2.getId(), start.minusMinutes(210), duration));
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println();
+
+            System.out.println("-----Выводим историю просмотров-----");
+            System.out.println(manager.getHistory());
+            System.out.println();
             System.out.println("Далее тестируем newManager, загруженный из файла");
-            // Восстанавливаем FileBackedTaskManager newManager из сохраненного файла и выполняем операции с ним
-            FileBackedTaskManager newManager = loadFromFile(tempTestFile);
-            System.out.println("История просмотров тасков newManager:");
-            System.out.println(newManager.getHistory());
-            System.out.println();
+            // Восстанавливаем FileBackedTaskManager backedTaskManager из сохраненного файла и выполняем операции с ним
 
-            Task task6 = newManager.createTask(new Task("TASK6", "SOMETHINGTODO6", TaskStatus.NEW));
-            System.out.println("Добавили task6 и вывели его id (должно быть 13)");
-            System.out.println(task6.getId());
-            Task task7 = newManager.createTask(new Task("TASK7", "SOMETHINGTODO7", TaskStatus.NEW));
-            System.out.println("Добавили task7 и вывели его id (должно быть 14)");
-            System.out.println(task7.getId());
-            System.out.println();
-            System.out.println(newManager.getAllSubtasks());
-            System.out.println(newManager.getAllTasks());
-            System.out.println(newManager.getAllEpics());
-            System.out.println(newManager.getEpicsSubtasks(newManager.epicStorage.get(6)));
-            System.out.println(newManager.epicStorage.get(7).getSubtasksId());
-            System.out.println(newManager.getHistory());
-            newManager.deleteAllTasks();
-            System.out.println(newManager.getAllEpics());
-            System.out.println(newManager.getAllSubtasks());
-            System.out.println(newManager.getHistory());
+            FileBackedTaskManager backedTaskManager = loadFromFile(tempTestFile);
 
-            //После завершения выполнения инструкций содержание файла tempTestFile.cvs должно быть следующим:
-          /*id,type,name,status,description,epic
-            7,EPIC,EPIC2,NEW,SOMEOFEPIC2
-            11,SUBTASK,SUBTASK4,NEW,SOMEOFSUBTASK4,7
-            12,SUBTASK,SUBTASK5,NEW,SOMEOFSUBTASK5,7
-            HISTORY:
-            11,SUBTASK,SUBTASK4,NEW,SOMEOFSUBTASK4,7
-            12,SUBTASK,SUBTASK5,NEW,SOMEOFSUBTASK5,7*/
+            System.out.println(backedTaskManager.getHistory());
+            System.out.println(backedTaskManager.getAllTasks());
+            System.out.println(backedTaskManager.getAllSubtasks());
+            System.out.println(backedTaskManager.getAllEpics());
+            System.out.println(backedTaskManager.getPrioritizedTasks());
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка создания файла.");
@@ -119,8 +122,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Integer key : subtaskStorage.keySet()) {
                 fileWriter.write(subtaskStorage.get(key).toString() + "\n");
             }
-            fileWriter.write(SEPARATE_LINE + "\n");
+            fileWriter.write(HISTORY_LINE + "\n");
             for (Task task : historyManager.getHistory()) {
+                fileWriter.write(task.toString() + "\n");
+            }
+            fileWriter.write(PRIORITIZED_TASKS + "\n");
+            for (Task task : prioritizedTasks) {
                 fileWriter.write(task.toString() + "\n");
             }
         } catch (IOException e) {
@@ -131,6 +138,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
 
     protected Task fromString(String value) {
+
         String[] split = value.split(",");
         TaskType type = TaskType.valueOf(split[1]);
         TaskStatus status = TaskStatus.valueOf(split[3]);
@@ -138,14 +146,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         switch (type) {
             case TASK:
-                task = new Task(Integer.parseInt(split[0]), split[2], split[4], status);
+                if (split.length > 5) {
+                    task = new Task(Integer.parseInt(split[0]), split[2], split[4], status,
+                            LocalDateTime.parse(split[5]), Duration.ofMinutes(Integer.parseInt(split[6])));
+                } else {
+                    task = new Task(Integer.parseInt(split[0]), split[2], split[4], status);
+                }
                 break;
             case EPIC:
-                task = new Epic(Integer.parseInt(split[0]), split[2], split[4]);
+                if (split.length > 5) {
+                    task = new Epic(Integer.parseInt(split[0]), split[2], split[4]);
+                    task.setStartTime(LocalDateTime.parse(split[5]));
+                    task.setDuration(Duration.ofMinutes(Integer.parseInt(split[6])));
+                } else
+                    task = new Epic(Integer.parseInt(split[0]), split[2], split[4]);
                 task.setStatus(status);
                 break;
             case SUBTASK:
-                task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status, Integer.parseInt(split[5]));
+                if (split.length > 6) {
+                    task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status,
+                            Integer.parseInt(split[7]), LocalDateTime.parse(split[5]),
+                            Duration.ofMinutes(Integer.parseInt(split[6])));
+                } else
+                    task = new Subtask(Integer.parseInt(split[0]), split[2], split[4], status,
+                            Integer.parseInt(split[5]));
                 break;
             default:
                 throw new ManagerSaveException("Неизвестный тип данных.");
@@ -157,13 +181,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader reader = new BufferedReader(new FileReader(path.toString()))) {
             reader.readLine();
             boolean isNotHistory = true;
+            boolean isNotPriority = true;
             int maxId = 1;
             while (reader.ready()) {
                 String data = reader.readLine();
                 if (data.isEmpty() || data.isBlank()) {
                     break;
                 }
-                if (!data.equals(SEPARATE_LINE) && isNotHistory) {
+                if (!data.equals(HISTORY_LINE) && isNotHistory) {
                     Task task = fromString(data);
                     switch (task.getType()) {
                         case TASK:
@@ -184,14 +209,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             throw new ManagerSaveException("Неизвестный тип данных.");
                     }
                 }
-                if (data.equals(SEPARATE_LINE)) {
+                if (data.equals(HISTORY_LINE)) {
                     data = reader.readLine();
                     isNotHistory = false;
                 }
-                if (!isNotHistory) {
+                if (data.equals(PRIORITIZED_TASKS)) {
+                    data = reader.readLine();
+                    isNotPriority = false;
+                }
+                if (!isNotHistory && isNotPriority) {
+                    historyManager.add(fromString(data));
+                }
+
+                if (!isNotPriority) {
                     if (data == null)
                         break;
-                    historyManager.add(fromString(data));
+                    prioritizedTasks.add(fromString(data));
                 }
             }
             setNewMaxTaskId(maxId);
