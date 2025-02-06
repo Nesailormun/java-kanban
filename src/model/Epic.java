@@ -1,4 +1,6 @@
-package module;
+package model;
+
+import enums.TaskType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

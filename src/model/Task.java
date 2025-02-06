@@ -1,4 +1,7 @@
-package module;
+package model;
+
+import enums.TaskStatus;
+import enums.TaskType;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

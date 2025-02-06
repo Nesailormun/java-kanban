@@ -1,5 +1,5 @@
-import module.Epic;
-import module.Subtask;
+import model.Epic;
+import model.Subtask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.InMemoryTaskManager;
@@ -8,7 +8,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static module.TaskStatus.*;
+import static enums.TaskStatus.*;
 
 public class EpicTest {
 

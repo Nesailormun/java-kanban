@@ -1,7 +1,7 @@
-import module.Epic;
-import module.Subtask;
-import module.Task;
-import module.TaskStatus;
+import model.Epic;
+import model.Subtask;
+import model.Task;
+import enums.TaskStatus;
 import service.TaskManager;
 
 import java.time.Duration;

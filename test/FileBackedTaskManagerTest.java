@@ -1,5 +1,6 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import enums.TaskStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import module.*;
+import model.*;
 import exceptions.ManagerSaveException;
 import service.FileBackedTaskManager;
 

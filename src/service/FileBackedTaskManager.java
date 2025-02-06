@@ -1,7 +1,9 @@
 package service;
 
+import enums.TaskStatus;
+import enums.TaskType;
 import exceptions.ManagerSaveException;
-import module.*;
+import model.*;
 
 import java.io.*;
 import java.nio.file.Path;

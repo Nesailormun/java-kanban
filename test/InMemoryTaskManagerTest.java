@@ -1,16 +1,14 @@
 import static org.junit.jupiter.api.Assertions.*;
 
+import enums.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import module.*;
+import model.*;
 import service.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
@@ -22,7 +20,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
     @Test
     void assertManagerIsWorkingCorrectly() {
-        assertInstanceOf(InMemoryTaskManager.class, new Manager().getDefault());
+        assertInstanceOf(InMemoryTaskManager.class, Manager.getDefault());
         assertInstanceOf(InMemoryHistoryManager.class, Manager.getDefaultHistory(), "getDefaultHistory" +
                 " не создает экземпляр менеджера service.InMemoryHistoryManager");
         assertInstanceOf(TaskManager.class, manager, "service.Manager не создает проинициализированный экземпляр" +

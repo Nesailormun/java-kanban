@@ -1,7 +1,7 @@
 package service;
 
-import module.CustomLinkedHashMap;
-import module.Task;
+import model.CustomLinkedHashMap;
+import model.Task;
 
 import java.util.*;
 

@@ -1,6 +1,7 @@
 package service;
 
-import module.*;
+import enums.TaskStatus;
+import model.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -29,7 +30,8 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     public static void main(String[] args) {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+
+        TaskManager manager = Manager.getDefault();
 
         Task task1 = manager.createTask(new Task("TASK1NODATETIME", "SOMETHINGTODO1", TaskStatus.NEW));
         Task task2 = manager.createTask(new Task("TASK2NODATETIME", "SOMETHINGTODO2", TaskStatus.NEW));

@@ -1,13 +1,15 @@
 package service;
 
-import module.Epic;
-import module.Subtask;
-import module.Task;
+import model.Epic;
+import model.Subtask;
+import model.Task;
 
 import java.util.List;
 
 
 public interface TaskManager {
+
+    List<Task> getPrioritizedTasks();
 
     List<Task> getHistory();
     // Beginning of module.Task methods:
@@ -54,5 +56,6 @@ public interface TaskManager {
     void removeSubtask(int id);
 
     void deleteAllSubtasks();
+
 }
 
