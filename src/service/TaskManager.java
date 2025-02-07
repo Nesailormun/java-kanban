@@ -1,5 +1,6 @@
 package service;
 
+import exceptions.NotFoundException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -14,7 +15,7 @@ public interface TaskManager {
     List<Task> getHistory();
     // Beginning of module.Task methods:
 
-    Task getTaskById(int id);
+    Task getTaskById(int id) throws NotFoundException;
 
     Task createTask(Task task);
 
@@ -32,7 +33,7 @@ public interface TaskManager {
 
     void updateEpic(Epic epic);
 
-    Epic getEpicById(int id);
+    Epic getEpicById(int id) throws NotFoundException;
 
     List<Epic> getAllEpics();
 
@@ -49,7 +50,7 @@ public interface TaskManager {
 
     void updateSubtask(Subtask subtask);
 
-    Subtask getSubtaskById(int id);
+    Subtask getSubtaskById(int id) throws NotFoundException;
 
     List<Subtask> getAllSubtasks();
 

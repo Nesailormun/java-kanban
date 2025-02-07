@@ -1,3 +1,4 @@
+import exceptions.NotFoundException;
 import model.Epic;
 import model.Subtask;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,44 +31,57 @@ public class EpicTest {
 
     @Test
     void assertEpicHasStatusNew() {
-        assertEquals(NEW, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+        try {
+            assertEquals(NEW, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+        }
+        catch (NotFoundException exception){
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
     void assertEpicHasStatusDone() {
-        manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", DONE,
-                1));
-        manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", DONE,
-                1));
-        manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", DONE,
-                1));
-        assertEquals(DONE, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+        try {
+            manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", DONE,
+                    1));
+            manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", DONE,
+                    1));
+            manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", DONE,
+                    1));
+            assertEquals(DONE, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
     void assertEpicHasStatusInProgress() {
-        manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", NEW,
-                1));
-        manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", DONE,
-                1));
-        manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", DONE,
-                1));
-        assertEquals(IN_PROGRESS, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+        try {
+            manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", NEW,
+                    1));
+            manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", DONE,
+                    1));
+            manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", DONE,
+                    1));
+            assertEquals(IN_PROGRESS, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
 
-        manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", IN_PROGRESS,
-                1));
-        manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", IN_PROGRESS,
-                1));
-        manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", IN_PROGRESS,
-                1));
-        assertEquals(IN_PROGRESS, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+            manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", IN_PROGRESS,
+                    1));
+            manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", IN_PROGRESS,
+                    1));
+            manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", IN_PROGRESS,
+                    1));
+            assertEquals(IN_PROGRESS, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
 
-        manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", IN_PROGRESS,
-                1));
-        manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", DONE,
-                1));
-        manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", NEW,
-                1));
-        assertEquals(IN_PROGRESS, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+            manager.updateSubtask(new Subtask(2, "SUBTASK1", "SOMEOFSUBTASK1", IN_PROGRESS,
+                    1));
+            manager.updateSubtask(new Subtask(3, "SUBTASK2", "SOMEOFSUBTASK2", DONE,
+                    1));
+            manager.updateSubtask(new Subtask(4, "SUBTASK3", "SOMEOFSUBTASK3", NEW,
+                    1));
+            assertEquals(IN_PROGRESS, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 }

@@ -3,6 +3,7 @@ package service;
 import enums.TaskStatus;
 import enums.TaskType;
 import exceptions.ManagerSaveException;
+import exceptions.NotFoundException;
 import model.*;
 
 import java.io.*;
@@ -104,6 +105,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка создания файла.");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
         }
     }
 
@@ -272,7 +275,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task getTaskById(int id) {
+    public Task getTaskById(int id) throws NotFoundException {
         Task task = super.getTaskById(id);
         save();
         return task;
@@ -291,7 +294,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Epic getEpicById(int id) {
+    public Epic getEpicById(int id) throws NotFoundException{
         Epic epic = super.getEpicById(id);
         save();
         return epic;
@@ -322,7 +325,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Subtask getSubtaskById(int id) {
+    public Subtask getSubtaskById(int id) throws NotFoundException {
         Subtask subtask = super.getSubtaskById(id);
         save();
         return subtask;

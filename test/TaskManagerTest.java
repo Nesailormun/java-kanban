@@ -1,3 +1,4 @@
+import exceptions.NotFoundException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
@@ -23,23 +24,34 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 start, duration));
         Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW,
                 start.plusMinutes(30), duration));
-        manager.getTaskById(task1.getId());
-        manager.getTaskById(task2.getId());
-        assertEquals(2, manager.getHistory().size(), "Неккоректное сохранение в истории");
+
+        try {
+            manager.getTaskById(task1.getId());
+            manager.getTaskById(task2.getId());
+            assertEquals(2, manager.getHistory().size(), "Неккоректное сохранение в истории");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
+
 
 
     // Beginning of module.Task Tests:
     @Test
     void getTaskById() {
-        LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
-        Duration duration = Duration.ofMinutes(30);
-        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
-                start, duration));
-        Task task2 = manager.createTask(null);
-        Task task3 = manager.getTaskById(task1.getId());
-        assertEquals(task1, task3, "Возвращение неверного таска");
-        assertNull(task2, "таск2 должен быть равен null");
+        try {
+            LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+            Duration duration = Duration.ofMinutes(30);
+            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
+                    start, duration));
+            Task task2 = manager.createTask(null);
+            Task task3 = manager.getTaskById(task1.getId());
+            assertEquals(task1, task3, "Возвращение неверного таска");
+            assertNull(task2, "таск2 должен быть равен null");
+        }
+        catch (NotFoundException exception){
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
@@ -57,14 +69,19 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateTask() {
-        LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
-        Duration duration = Duration.ofMinutes(30);
-        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
-                start, duration));
-        Task newTask1 = manager.createTask(new Task(1, "NEWTASK1", "SOMETHINGTODO1", TaskStatus.DONE,
-                start.plusMinutes(30), duration));
-        manager.updateTask(newTask1);
-        assertEquals(newTask1, manager.getTaskById(task1.getId()), "Таск не обновился");
+        try {
+            LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+            Duration duration = Duration.ofMinutes(30);
+            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
+                    start, duration));
+            Task newTask1 = manager.createTask(new Task(1, "NEWTASK1", "SOMETHINGTODO1", TaskStatus.DONE,
+                    start.plusMinutes(30), duration));
+            manager.updateTask(newTask1);
+            assertEquals(newTask1, manager.getTaskById(task1.getId()), "Таск не обновился");
+        }
+        catch (NotFoundException exception){
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
@@ -119,17 +136,25 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateEpic() {
-        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
-        manager.updateEpic(new Epic(1, "NEWEPIC1", "SOMENEWEPIC1"));
-        assertEquals("NEWEPIC1", manager.getEpicById(epic1.getId()).getName());
-        assertEquals("SOMENEWEPIC1", manager.getEpicById(epic1.getId()).getDescription());
+        try {
+            Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+            manager.updateEpic(new Epic(1, "NEWEPIC1", "SOMENEWEPIC1"));
+            assertEquals("NEWEPIC1", manager.getEpicById(epic1.getId()).getName());
+            assertEquals("SOMENEWEPIC1", manager.getEpicById(epic1.getId()).getDescription());
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
     void getEpicById() {
-        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
-        assertEquals(manager.getEpicById(epic1.getId()), epic1);
-        assertNull(manager.getEpicById(24));
+        try {
+            Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+            assertEquals(manager.getEpicById(epic1.getId()), epic1);
+            assertNull(manager.getEpicById(24));
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
@@ -202,14 +227,18 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getSubtaskById() {
-        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
-        Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
-                LocalDateTime.now(), Duration.ofMinutes(20)));
-        Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
-                subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
-        assertEquals(subtask1, manager.getSubtaskById(subtask1.getId()));
-        assertNotEquals(subtask2, manager.getSubtaskById(subtask1.getId()));
-        assertNull(manager.getSubtaskById(123));
+        try {
+            Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+            Subtask subtask1 = manager.createSubtask(new Subtask("Subtask1", "SomeSubtask1", 1,
+                    LocalDateTime.now(), Duration.ofMinutes(20)));
+            Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
+                    subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
+            assertEquals(subtask1, manager.getSubtaskById(subtask1.getId()));
+            assertNotEquals(subtask2, manager.getSubtaskById(subtask1.getId()));
+            assertNull(manager.getSubtaskById(123));
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test

@@ -1,6 +1,7 @@
 package service;
 
 import enums.TaskStatus;
+import exceptions.NotFoundException;
 import model.*;
 
 import java.time.Duration;
@@ -120,12 +121,12 @@ public class InMemoryTaskManager implements TaskManager {
     // Beginning of module.Task methods:
 
     @Override
-    public Task getTaskById(int id) {
-        if (taskStorage.containsKey(id)) {
-            historyManager.add(taskStorage.get(id));
-            return taskStorage.get(id);
-        }
-        return null;
+    public Task getTaskById(int id) throws NotFoundException{
+            if (taskStorage.containsKey(id)) {
+                historyManager.add(taskStorage.get(id));
+                return taskStorage.get(id);
+            }
+            throw new NotFoundException("Передан неверный идентификатор таска");
     }
 
     @Override
@@ -218,12 +219,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpicById(int id) {
+    public Epic getEpicById(int id) throws NotFoundException{
         if (epicStorage.containsKey(id)) {
             historyManager.add(epicStorage.get(id));
             return epicStorage.get(id);
         }
-        return null;
+        throw new NotFoundException("Передан неверный идентификатор эпика");
     }
 
     @Override
@@ -354,12 +355,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask getSubtaskById(int id) {
+    public Subtask getSubtaskById(int id) throws NotFoundException {
         if (subtaskStorage.containsKey(id)) {
             historyManager.add(subtaskStorage.get(id));
             return subtaskStorage.get(id);
         }
-        return null;
+        throw new NotFoundException("Передан неверный идентификатор сабтаска");
     }
 
     @Override
