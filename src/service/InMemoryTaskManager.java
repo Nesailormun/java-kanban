@@ -1,7 +1,9 @@
 package service;
 
 import enums.TaskStatus;
+import exceptions.DateTimeIntersectionException;
 import exceptions.NotFoundException;
+import exceptions.NullEqualsException;
 import model.*;
 
 import java.time.Duration;
@@ -121,21 +123,21 @@ public class InMemoryTaskManager implements TaskManager {
     // Beginning of module.Task methods:
 
     @Override
-    public Task getTaskById(int id) throws NotFoundException{
-            if (taskStorage.containsKey(id)) {
-                historyManager.add(taskStorage.get(id));
-                return taskStorage.get(id);
-            }
-            throw new NotFoundException("Передан неверный идентификатор таска");
+    public Task getTaskById(int id) throws NotFoundException {
+        if (taskStorage.containsKey(id)) {
+            historyManager.add(taskStorage.get(id));
+            return taskStorage.get(id);
+        }
+        throw new NotFoundException("Exception! Not founded task, incorrect id!");
     }
 
     @Override
     public Task createTask(Task task) {
         if (task == null) {
-            return null;
+            throw new NullEqualsException("Exception! Task should not be null!");
         }
         if (!isValid(task))
-            return null;
+            throw new DateTimeIntersectionException("Exception! Time intervals interaction!");
         if (task.getId() == 0) {
             task.setId(taskId);
         }
@@ -151,21 +153,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateTask(Task task) {
         if (task == null) {
-            return;
+            throw new NullEqualsException("Exception! Task should not be null!");
         }
         if (!isValid(task))
-            return;
-        if (taskStorage.containsKey(task.getId())) {
-            prioritizedTasks.remove(taskStorage.get(task.getId()));
-            prioritizedTasks.add(task);
-            taskStorage.put(task.getId(), task);
-        }
+            throw new DateTimeIntersectionException("Exception! Time intervals intersection!");
+        if (!(taskStorage.containsKey(task.getId())))
+            throw new NotFoundException("Exception! Not founded task, incorrect id!");
+        prioritizedTasks.remove(taskStorage.get(task.getId()));
+        prioritizedTasks.add(task);
+        taskStorage.put(task.getId(), task);
+
     }
 
     @Override
     public void removeTask(int id) {
         if (!taskStorage.containsKey(id))
-            return;
+            throw new NotFoundException("Exception! Not founded task, incorrect id!");
         prioritizedTasks.remove(taskStorage.get(id));
         taskStorage.remove(id);
         historyManager.remove(id);
@@ -196,7 +199,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic createEpic(Epic epic) {
         if (epic == null) {
-            return null;
+            throw new NullEqualsException("Exception! Epic should not be null!");
         }
         if (epic.getId() == 0) {
             epic.setId(taskId);
@@ -210,21 +213,22 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         if (epic == null) {
-            return;
+            throw new NullEqualsException("Exception! Epic should not be null!");
         }
-        if (epicStorage.containsKey(epic.getId())) {
-            epicStorage.get(epic.getId()).setName(epic.getName());
-            epicStorage.get(epic.getId()).setDescription(epic.getDescription());
-        }
+        if (!(epicStorage.containsKey(epic.getId())))
+            throw new NotFoundException("Exception! Not founded epic, incorrect id!");
+        epicStorage.get(epic.getId()).setName(epic.getName());
+        epicStorage.get(epic.getId()).setDescription(epic.getDescription());
+
     }
 
     @Override
-    public Epic getEpicById(int id) throws NotFoundException{
+    public Epic getEpicById(int id) throws NotFoundException {
         if (epicStorage.containsKey(id)) {
             historyManager.add(epicStorage.get(id));
             return epicStorage.get(id);
         }
-        throw new NotFoundException("Передан неверный идентификатор эпика");
+        throw new NotFoundException("Exception! Not founded epic, incorrect id!");
     }
 
     @Override
@@ -237,15 +241,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpic(int id) {
-        if (epicStorage.containsKey(id)) {
-            for (int subtaskId : epicStorage.get(id).getSubtasksId()) {
-                prioritizedTasks.remove(subtaskStorage.get(subtaskId));
-                subtaskStorage.remove(subtaskId);
-                historyManager.remove(subtaskId);
-            }
-            epicStorage.remove(id);
-            historyManager.remove(id);
+        if (!epicStorage.containsKey(id))
+            throw new NotFoundException("Exception! Not founded epic, incorrect id!");
+        for (int subtaskId : epicStorage.get(id).getSubtasksId()) {
+            prioritizedTasks.remove(subtaskStorage.get(subtaskId));
+            subtaskStorage.remove(subtaskId);
+            historyManager.remove(subtaskId);
         }
+        epicStorage.remove(id);
+        historyManager.remove(id);
+
     }
 
     @Override
@@ -286,7 +291,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Subtask> getEpicsSubtasks(Epic epic) {
         if (epic == null)
-            return new ArrayList<>();
+            throw new NullEqualsException("Exception! Epic should not be null!");
         if (epic.getSubtasksId().isEmpty())
             return new ArrayList<>();
 
@@ -301,14 +306,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask createSubtask(Subtask subtask) {
         if (subtask == null) {
-            return null;
+            throw new NullEqualsException("Exception! Subtask should not be null!");
         }
         int idOfEpic = subtask.getEpicId();
         if (!epicStorage.containsKey(idOfEpic)) {
-            return null;
+            throw new NotFoundException("Exception! Not founded epicId of subtask!");
         }
         if (!isValid(subtask)) {
-            return null;
+            throw new DateTimeIntersectionException("Exception! Time intervals intersection!");
         }
         if (subtask.getId() == 0) {
             subtask.setId(taskId);
@@ -330,18 +335,18 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         if (subtask == null) {
-            return;
+            throw new NullEqualsException("Exception! Subtask should not be null!");
         }
         if (!isValid(subtask))
-            return;
+            throw new DateTimeIntersectionException("Exception! Time intervals intersection!");
         if (!subtaskStorage.containsKey(subtask.getId())) {
-            return;
+            throw new NotFoundException("Exception! Not founded subtask, incorrect id!");
         }
         int subtaskId = subtask.getId();
         Subtask oldSubtask = subtaskStorage.get(subtaskId);
         int subtaskEpicId = subtask.getEpicId();
         if (!epicStorage.containsKey(subtaskEpicId)) {
-            return;
+            throw new NotFoundException("Exception! Not founded epicId of subtask!");
         }
         Epic epic = epicStorage.get(subtaskEpicId);
         if (!epic.getSubtasksId().contains(subtask.getId())) {
@@ -360,7 +365,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(subtaskStorage.get(id));
             return subtaskStorage.get(id);
         }
-        throw new NotFoundException("Передан неверный идентификатор сабтаска");
+        throw new NotFoundException("Exception! Not founded subtask, incorrect id!");
     }
 
     @Override
@@ -374,7 +379,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtask(int id) {
         if (!subtaskStorage.containsKey(id))
-            return;
+            throw new NotFoundException("Exception! Not founded subtask, incorrect id!");
         int relatedEpicId = subtaskStorage.get(id).getEpicId();
         Epic relatedEpic = epicStorage.get(relatedEpicId);
         prioritizedTasks.remove(subtaskStorage.get(id));

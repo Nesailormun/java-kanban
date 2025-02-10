@@ -1,9 +1,6 @@
 package server.handlers;
 
-import adapters.DateTimeAdapter;
-import adapters.DurationAdapter;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import enums.Endpoint;
@@ -13,8 +10,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class BaseHttpHandler implements HttpHandler {
@@ -23,14 +18,9 @@ public class BaseHttpHandler implements HttpHandler {
     protected final Gson gson;
     protected static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-    public BaseHttpHandler(TaskManager manager) {
+    public BaseHttpHandler(TaskManager manager,Gson gson) {
         this.manager = manager;
-        this.gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .registerTypeAdapter(LocalDateTime.class, new DateTimeAdapter())
-                .registerTypeAdapter(Duration.class, new DurationAdapter())
-                .create();
+        this.gson = gson;
     }
 
 
@@ -48,7 +38,16 @@ public class BaseHttpHandler implements HttpHandler {
         }
     }
 
-    protected void sendCreated(HttpExchange h, String text) throws IOException {
+    protected void sendBadRequest(HttpExchange h) throws IOException {
+        byte[] resp = "Bad Request".getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        try (OutputStream os = h.getResponseBody()) {
+            h.sendResponseHeaders(400, resp.length);
+            os.write(resp);
+        }
+    }
+
+    protected void sendModified(HttpExchange h, String text) throws IOException {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         h.sendResponseHeaders(201, resp.length);
@@ -67,16 +66,18 @@ public class BaseHttpHandler implements HttpHandler {
     }
 
 
-    protected void sendHasInteractions(HttpExchange h) throws IOException {
-        byte[] resp = "Задача пересекается с существующими!".getBytes(StandardCharsets.UTF_8);
-        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-        h.sendResponseHeaders(406, resp.length);
-        h.getResponseBody().write(resp);
-        h.close();
+    protected void sendHasInteractions(HttpExchange h, String text)  {
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        try (OutputStream os = h.getResponseBody()) {
+            h.sendResponseHeaders(406, resp.length);
+            os.write(resp);
+        } catch (IOException e) {
+            System.out.println("Ошибка при отправке ответа: 406(Not Acceptable)");
+        }
     }
 
     protected void sendServerError(HttpExchange h) {
-        byte[] resp = "Ошибка обработки запроса".getBytes(StandardCharsets.UTF_8);
+        byte[] resp = "Server Error".getBytes(StandardCharsets.UTF_8);
         try (OutputStream os = h.getResponseBody()) {
             h.sendResponseHeaders(500, resp.length);
             os.write(resp);

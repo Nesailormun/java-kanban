@@ -1,62 +1,67 @@
 package server.handlers;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import enums.Endpoint;
+import exceptions.DateTimeIntersectionException;
 import exceptions.NotFoundException;
+import exceptions.NullEqualsException;
 import model.Task;
 import service.TaskManager;
-
 
 import java.io.IOException;
 import java.io.InputStream;
 
 public class TaskHandler extends BaseHttpHandler {
 
-
-    public TaskHandler(TaskManager manager) {
-        super(manager);
+    public TaskHandler(TaskManager manager, Gson gson) {
+        super(manager, gson);
     }
 
     @Override
     public void handle(HttpExchange exchange) {
-        Endpoint endpoint = getEndpoint(exchange.getRequestMethod());
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        try {
+            Endpoint endpoint = getEndpoint(exchange.getRequestMethod());
+            String[] pathParts = exchange.getRequestURI().getPath().split("/");
 
-        switch (endpoint) {
-            case GET: {
-                if (pathParts.length == 2) {
-                    handleGetAllTasks(exchange);
-                    break;
-                }
-                else if (pathParts.length == 3 && getTaskId(pathParts).isPresent()) {
+            if (endpoint.equals(Endpoint.UNKNOWN) || (pathParts.length == 3 && getTaskId(pathParts).isEmpty())) {
+                sendBadRequest(exchange);
+                return;
+            }
+            switch (endpoint) {
+                case GET: {
+                    if (pathParts.length == 2) {
+                        handleGetAllTasks(exchange);
+                        break;
+                    } else if (pathParts.length == 3) {
                         handleGetTaskById(exchange, getTaskId(pathParts).get());
                         break;
-                }
-                System.out.println("Такого эндпоинта не существует");
-                break;
-            }
-            case POST: {
-                if (pathParts.length == 2) {
-                    handleCreateTask(exchange);
-                    break;
-                } else if (pathParts.length == 3 && getTaskId(pathParts).isPresent()) {
-                    handleUpdateTask(exchange);
+                    }
+                    sendBadRequest(exchange);
                     break;
                 }
-                System.out.println("Такого эндпоинта не существует");
-                break;
-            }
-            case DELETE: {
-                if (pathParts.length == 3 && getTaskId(pathParts).isPresent()) {
-                    handleDeleteTask(exchange, getTaskId(pathParts).get());
+                case POST: {
+                    if (pathParts.length == 2) {
+                        handleCreateTask(exchange);
+                        break;
+                    } else if (pathParts.length == 3) {
+                        handleUpdateTask(exchange, getTaskId(pathParts).get());
+                        break;
+                    }
+                    sendBadRequest(exchange);
                     break;
                 }
-                System.out.println("Такого эндпоинта не существует");
-                break;
+                case DELETE: {
+                    if (pathParts.length == 3) {
+                        handleDeleteTask(exchange, getTaskId(pathParts).get());
+                        break;
+                    }
+                    sendBadRequest(exchange);
+                    break;
+                }
             }
-            default:
-                System.out.println("Такого эндпоинта не существует");
-                break;
+        } catch (IOException exception) {
+            sendServerError(exchange);
         }
     }
 
@@ -64,31 +69,31 @@ public class TaskHandler extends BaseHttpHandler {
         try {
             String response = gson.toJson(manager.getTaskById(taskId));
             sendText(exchange, response);
-
         } catch (NotFoundException exception) {
             sendNotFound(exchange, "Таска с идентификатором: " + taskId + " не существует!");
         } catch (IOException e) {
-            System.out.println("Ошибка отправки ответа.");
+            sendServerError(exchange);
         }
     }
 
     private void handleGetAllTasks(HttpExchange exchange) {
         try {
-            String response = gson.toJson(manager.getAllTasks().toString());
+            String response = gson.toJson(manager.getAllTasks());
             sendText(exchange, response);
         } catch (IOException e) {
-            System.out.println("Ошибка отправки ответа.");
+            sendServerError(exchange);
         }
     }
 
     private void handleDeleteTask(HttpExchange exchange, Integer taskId) {
         try {
             manager.removeTask(taskId);
-            String response = "Таск с идентификатором: " + taskId + " удалена!";
+            String response = "Таск с идентификатором: " + taskId + " удален!";
             sendText(exchange, response);
-        }
-        catch (IOException e){
-            System.out.println("Ошибка отправки ответа.");
+        } catch (IOException e) {
+            sendServerError(exchange);
+        } catch (NotFoundException e) {
+            sendNotFound(exchange, e.getMessage());
         }
     }
 
@@ -97,30 +102,32 @@ public class TaskHandler extends BaseHttpHandler {
             InputStream inputStream = exchange.getRequestBody();
             String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Task task = gson.fromJson(body, Task.class);
-            if (manager.createTask(task) == null){
-                sendHasInteractions(exchange);
-            }
             manager.createTask(task);
             String response = "Таск с идентификатором: " + task.getId() + " успешно добавлен!";
-            sendCreated(exchange, response);
-        }
-        catch (IOException e){
+            sendModified(exchange, response);
+        } catch (IOException e) {
             sendServerError(exchange);
+        } catch (NullEqualsException e) {
+            sendNotFound(exchange, e.getMessage());
+        } catch (DateTimeIntersectionException e) {
+            sendHasInteractions(exchange, e.getMessage());
         }
     }
 
-    private void handleUpdateTask(HttpExchange exchange) {
+    private void handleUpdateTask(HttpExchange exchange, Integer taskId) {
         try {
             InputStream inputStream = exchange.getRequestBody();
             String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Task task = gson.fromJson(body, Task.class);
             manager.updateTask(task);
-            String response = "Таск с идентификатором: " + task.getId() + " успешно обновлен!";
-            sendCreated(exchange, response);
-        }
-        catch (IOException e){
+            String response = "Таск с идентификатором: " + taskId + " успешно обновлен!";
+            sendModified(exchange, response);
+        } catch (IOException e) {
             sendServerError(exchange);
+        } catch (NullEqualsException | NotFoundException e) {
+            sendNotFound(exchange, e.getMessage());
+        } catch (DateTimeIntersectionException e) {
+            sendHasInteractions(exchange, e.getMessage());
         }
     }
-
 }
