@@ -107,7 +107,7 @@ public class SubtaskHandler extends BaseHttpHandler {
             sendModified(exchange, response);
         } catch (IOException e) {
             sendServerError(exchange);
-        } catch (NullEqualsException e) {
+        } catch (NullEqualsException | NotFoundException e) {
             sendNotFound(exchange, e.getMessage());
         } catch (DateTimeIntersectionException e) {
             sendHasInteractions(exchange, e.getMessage());

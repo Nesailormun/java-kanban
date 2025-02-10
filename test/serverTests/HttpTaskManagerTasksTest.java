@@ -62,6 +62,22 @@ public class HttpTaskManagerTasksTest {
         assertNotNull(tasksFromManager.toString(), "Задачи не возвращаются");
         assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
         assertEquals("Test", tasksFromManager.getFirst().getName(), "Некорректное имя задачи");
+
+        // тестируем добавление задачи с пересекающимся временным интервалом, должен вернуть код 406
+        LocalDateTime start = LocalDateTime.of(2025, 2, 10, 10, 0);
+        Duration duration = Duration.ofMinutes(30);
+        manager.createTask(new Task("TASK2", "SOMETASK", TaskStatus.DONE, start, duration));
+        manager.createTask(new Task("TASK3", "SOMETASK", TaskStatus.DONE,
+                start.plusMinutes(30), duration));
+        Task task1 = new Task("Wrong task", "ERRROORR", start, duration);
+        String taskJson1 = gson.toJson(task1);
+        URI url1 = URI.create("http://localhost:8080/tasks");
+        HttpRequest request1 = HttpRequest.newBuilder()
+                .uri(url1)
+                .POST(HttpRequest.BodyPublishers.ofString(taskJson1))
+                .build();
+        HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(406, response1.statusCode());
     }
 
     @Test
