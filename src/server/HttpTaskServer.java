@@ -32,7 +32,6 @@ public class HttpTaskServer {
         HttpTaskServer.manager = manager;
         HttpTaskServer.gson = gson;
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-
         httpServer.createContext("/tasks", new TaskHandler(manager, gson));
         httpServer.createContext("/subtasks", new SubtaskHandler(manager, gson));
         httpServer.createContext("/epics", new EpicHandler(manager, gson));

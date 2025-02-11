@@ -28,7 +28,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка создания временного файла.");
         }
-
     }
 
     @Test
@@ -68,6 +67,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
             System.out.println(exception.getMessage());
         }
     }
+
     @Test
     void testTwoDifferentManagersFromSameFile() {
 

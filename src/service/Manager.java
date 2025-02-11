@@ -12,7 +12,7 @@ public class Manager {
         return new InMemoryTaskManager();
     }
 
-    public static TaskManager getDefaultFileBackedTaskManager(Path path){
+    public static TaskManager getDefaultFileBackedTaskManager(Path path) {
         return new FileBackedTaskManager(path);
     }
 }

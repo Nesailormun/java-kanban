@@ -35,7 +35,6 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
 
-
     // Beginning of module.Task Tests:
     @Test
     void getTaskById() {
@@ -48,8 +47,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
             Task task3 = manager.getTaskById(task1.getId());
             assertEquals(task1, task3, "Возвращение неверного таска");
             assertNull(task2, "таск2 должен быть равен null");
-        }
-        catch (NotFoundException exception){
+        } catch (NotFoundException exception) {
             System.out.println(exception.getMessage());
         }
     }
@@ -78,8 +76,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                     start.plusMinutes(30), duration));
             manager.updateTask(newTask1);
             assertEquals(newTask1, manager.getTaskById(task1.getId()), "Таск не обновился");
-        }
-        catch (NotFoundException exception){
+        } catch (NotFoundException exception) {
             System.out.println(exception.getMessage());
         }
     }

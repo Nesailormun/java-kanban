@@ -33,8 +33,7 @@ public class EpicTest {
     void assertEpicHasStatusNew() {
         try {
             assertEquals(NEW, manager.getEpicById(1).getStatus(), "Неверный статус эпика");
-        }
-        catch (NotFoundException exception){
+        } catch (NotFoundException exception) {
             System.out.println(exception.getMessage());
         }
     }
