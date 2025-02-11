@@ -33,86 +33,87 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     public static void main(String[] args) {
+        try {
+            TaskManager manager = Manager.getDefault();
 
-        TaskManager manager = Manager.getDefault();
+            Task task1 = manager.createTask(new Task("TASK1NODATETIME", "SOMETHINGTODO1", TaskStatus.NEW));
+            Task task2 = manager.createTask(new Task("TASK2NODATETIME", "SOMETHINGTODO2", TaskStatus.NEW));
+            Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
+                    TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
+            Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4",
+                    TaskStatus.NEW, LocalDateTime.now().plus(Duration.ofMinutes(90)), Duration.ofMinutes(50)));
 
-        Task task1 = manager.createTask(new Task("TASK1NODATETIME", "SOMETHINGTODO1", TaskStatus.NEW));
-        Task task2 = manager.createTask(new Task("TASK2NODATETIME", "SOMETHINGTODO2", TaskStatus.NEW));
-        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
-                TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
-        Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4",
-                TaskStatus.NEW, LocalDateTime.now().plus(Duration.ofMinutes(90)), Duration.ofMinutes(50)));
-        Task task5 = manager.createTask(null);
-        Task task6 = manager.createTask(new Task("TASK6", "SOMETHINGTODO6",
-                TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(51)), Duration.ofMinutes(50)));
+            Task task6 = manager.createTask(new Task("TASK6", "SOMETHINGTODO6",
+                    TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(51)), Duration.ofMinutes(50)));
 
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println(manager.getAllTasks());
-        System.out.println();
-        manager.updateTask(new Task(task3.getId(), "TASK7", "SOMETHINGTODO7",
-                TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(141)), Duration.ofMinutes(50)));
-        manager.updateTask(new Task("WRONGUPDATETASK", "WRONG"));
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println(manager.getAllTasks());
+            System.out.println();
+            manager.updateTask(new Task(task3.getId(), "TASK7", "SOMETHINGTODO7",
+                    TaskStatus.NEW, LocalDateTime.now().minus(Duration.ofMinutes(141)), Duration.ofMinutes(50)));
 
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println(manager.getAllTasks());
-        manager.removeTask(task6.getId());
-        System.out.println();
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println(manager.getAllTasks());
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println(manager.getAllTasks());
+            manager.removeTask(task6.getId());
+            System.out.println();
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println(manager.getAllTasks());
 
-        manager.deleteAllTasks();
-        System.out.println();
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println(manager.getAllTasks());
-        Task task24 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
-                TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println(manager.getAllTasks());
+            manager.deleteAllTasks();
+            System.out.println();
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println(manager.getAllTasks());
+            Task task24 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3",
+                    TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(90)));
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println(manager.getAllTasks());
 
-        System.out.println();
-        System.out.println("------EPIC TEST-------");
-        Epic epic1 = manager.createEpic(new Epic("EPIC1", "DEPIC1"));
-        Epic epic2 = manager.createEpic(new Epic("EPIC2", "DEPIC2"));
-        Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "DSUBTASK1", epic1.getId(),
-                LocalDateTime.of(2025, 1, 27, 10, 0), Duration.ofMinutes(10)));
-        Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "DSUBTASK2", epic1.getId(),
-                subtask1.getStartTime().plusMinutes(10), Duration.ofMinutes(20)));
-        Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "DSUBTASK3", epic1.getId()));
-        Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "DSUBTASK4", epic2.getId(),
-                subtask1.getStartTime().minusMinutes(20), Duration.ofMinutes(15)));
+            System.out.println();
+            System.out.println("------EPIC TEST-------");
+            Epic epic1 = manager.createEpic(new Epic("EPIC1", "DEPIC1"));
+            Epic epic2 = manager.createEpic(new Epic("EPIC2", "DEPIC2"));
+            Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "DSUBTASK1", epic1.getId(),
+                    LocalDateTime.of(2025, 1, 27, 10, 0), Duration.ofMinutes(10)));
+            Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "DSUBTASK2", epic1.getId(),
+                    subtask1.getStartTime().plusMinutes(10), Duration.ofMinutes(20)));
+            Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "DSUBTASK3", epic1.getId()));
+            Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "DSUBTASK4", epic2.getId(),
+                    subtask1.getStartTime().minusMinutes(20), Duration.ofMinutes(15)));
 
-        System.out.println("-------ВЫВОД ПРИОРИТЕТНЫХ ЗАДАЧ----------");
-        System.out.println(manager.getPrioritizedTasks());
+            System.out.println("-------ВЫВОД ПРИОРИТЕТНЫХ ЗАДАЧ----------");
+            System.out.println(manager.getPrioritizedTasks());
 
-        System.out.println("--ПРОВЕРКА ОБНОВЛЕНИЯ САБТАСКА И СООТВЕТСТВУЮЩЕГО ЭПИКА---");
-        manager.updateSubtask(new Subtask(subtask2.getId(), "NEWSUBTASK2", "DNEWSUBTASK2",
-                TaskStatus.IN_PROGRESS, epic1.getId(), subtask1.getStartTime().plusMinutes(30), subtask2.getDuration()));
-        manager.updateSubtask(new Subtask(subtask4.getId(), "NEWSUBTASK4", "DNEWSUBTASK4",
-                TaskStatus.DONE, epic2.getId(), subtask1.getStartTime().minusMinutes(60), subtask4.getDuration()));
-        manager.updateSubtask(new Subtask(subtask3.getId(), "NEWSUBTASK3", "DNEWSUBTASK3",
-                TaskStatus.NEW, epic1.getId(), subtask1.getStartTime().plusMinutes(60), Duration.ofMinutes(20)));
+            System.out.println("--ПРОВЕРКА ОБНОВЛЕНИЯ САБТАСКА И СООТВЕТСТВУЮЩЕГО ЭПИКА---");
+            manager.updateSubtask(new Subtask(subtask2.getId(), "NEWSUBTASK2", "DNEWSUBTASK2",
+                    TaskStatus.IN_PROGRESS, epic1.getId(), subtask1.getStartTime().plusMinutes(30), subtask2.getDuration()));
+            manager.updateSubtask(new Subtask(subtask4.getId(), "NEWSUBTASK4", "DNEWSUBTASK4",
+                    TaskStatus.DONE, epic2.getId(), subtask1.getStartTime().minusMinutes(60), subtask4.getDuration()));
+            manager.updateSubtask(new Subtask(subtask3.getId(), "NEWSUBTASK3", "DNEWSUBTASK3",
+                    TaskStatus.NEW, epic1.getId(), subtask1.getStartTime().plusMinutes(60), Duration.ofMinutes(20)));
 
+            System.out.println(manager.getAllSubtasks());
+            System.out.println(manager.getAllEpics());
+            System.out.println(manager.getPrioritizedTasks());
+            System.out.println();
+            System.out.println("------ПРОВЕРКА УДАЛЕНИЯ САБТАСКОВ Subtask4 и Subtask1---------");
 
-        System.out.println(manager.getAllSubtasks());
-        System.out.println(manager.getAllEpics());
-        System.out.println(manager.getPrioritizedTasks());
-        System.out.println();
-        System.out.println("------ПРОВЕРКА УДАЛЕНИЯ САБТАСКОВ Subtask4 и Subtask1---------");
+            manager.removeSubtask(subtask4.getId());
+            manager.removeSubtask(subtask1.getId());
+            System.out.println(manager.getPrioritizedTasks());
 
-        manager.removeSubtask(subtask4.getId());
-        manager.removeSubtask(subtask1.getId());
-        System.out.println(manager.getPrioritizedTasks());
+            System.out.println();
+            System.out.println("------ПРОВЕРКА УДАЛЕНИЯ ВСЕХ САБТАСКОВ---------");
 
-        System.out.println();
-        System.out.println("------ПРОВЕРКА УДАЛЕНИЯ ВСЕХ САБТАСКОВ---------");
+            manager.deleteAllSubtasks();
+            System.out.println(manager.getPrioritizedTasks());
 
-        manager.deleteAllSubtasks();
-        System.out.println(manager.getPrioritizedTasks());
-
-        System.out.println();
-        System.out.println("------ПРОВЕРКА УДАЛЕНИЯ ВСЕХ ЭПИКОВ---------");
-        manager.deleteAllEpics();
-        System.out.println(manager.getPrioritizedTasks());
+            System.out.println();
+            System.out.println("------ПРОВЕРКА УДАЛЕНИЯ ВСЕХ ЭПИКОВ---------");
+            manager.deleteAllEpics();
+            System.out.println(manager.getPrioritizedTasks());
+        } catch (NotFoundException | NullEqualsException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override

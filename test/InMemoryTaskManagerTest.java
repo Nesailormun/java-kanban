@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.*;
 
 import enums.TaskStatus;
+import exceptions.DateTimeIntersectionException;
 import exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -133,135 +134,120 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
     @Test
     void testSubtask() {
-        try {
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Epic epic2 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
 
-            Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
-            Epic epic2 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
-
-            manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
-                    TaskStatus.NEW, epic1.getId()));
-            Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
-                    epic1.getId()));
-            manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
-                    epic1.getId()));
-            manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
-                    epic2.getId()));
-            manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
-                    epic2.getId()));
-            Subtask subtask6 = manager.createSubtask(new Subtask(45, "SomeNewSubtask", "ToDoInSubtask"
-                    , TaskStatus.NEW, 2));
-
-            assertEquals(subtask2.getEpicId(), epic1.getId(), "Сабтаск не знает свой эпик");
-
-            manager.updateSubtask(new Subtask(58, "WRONGSUBTASK", "FAKEEPICID",
-                    TaskStatus.NEW, 7));
-            assertNull(manager.getSubtaskById(58), "Сабтаск был добавлен к несуществующему эпику");
-
-            assertEquals(subtask6, manager.getSubtaskById(45), "Сабтаски с одинаковым ID не равны");
-
-            assertEquals(subtask6.toString(), manager.getSubtaskById(45).toString());
-        } catch (NotFoundException exception) {
-            System.out.println(exception.getMessage());
-        }
+        manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
+                TaskStatus.NEW, epic1.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
+                epic1.getId()));
+        manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
+                epic1.getId()));
+        manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
+                epic2.getId()));
+        manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
+                epic2.getId()));
+        Subtask subtask6 = manager.createSubtask(new Subtask(45, "SomeNewSubtask", "ToDoInSubtask",
+                TaskStatus.NEW, 2));
+        assertEquals(subtask2.getEpicId(), epic1.getId(), "Сабтаск не знает свой эпик");
+        assertThrows(NotFoundException.class, () -> manager.updateSubtask(new Subtask(58, "WRONGSUBTASK",
+                "FAKEEPICID", TaskStatus.NEW, 7)));
+        assertEquals(subtask6, manager.getSubtaskById(45), "Сабтаски с одинаковым ID не равны");
+        assertEquals(subtask6.toString(), manager.getSubtaskById(45).toString());
     }
 
 
     @Test
     void testHistoryManager() {
-        try {
-            assertTrue(manager.getHistory().isEmpty(), "История тасков должна быть пуста");
-            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
-            Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
-            Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW));
-            Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW));
-            Task task5 = manager.createTask(new Task("TASK5", "SOMETHINGTODO5", TaskStatus.NEW));
+        assertTrue(manager.getHistory().isEmpty(), "История тасков должна быть пуста");
+        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
+        Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
+        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW));
+        Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW));
+        Task task5 = manager.createTask(new Task("TASK5", "SOMETHINGTODO5", TaskStatus.NEW));
 
-            Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
-            Epic epic2 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        Epic epic2 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC2"));
 
-            Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
-                    epic1.getId()));
-            Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
-                    epic1.getId()));
-            Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
-                    epic1.getId()));
-            Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
-                    epic2.getId()));
-            Subtask subtask5 = manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
-                    epic2.getId()));
+        Subtask subtask1 = manager.createSubtask(new Subtask("SUBTASK1", "SOMEOFSUBTASK1",
+                epic1.getId()));
+        Subtask subtask2 = manager.createSubtask(new Subtask("SUBTASK2", "SOMEOFSUBTASK2",
+                epic1.getId()));
+        Subtask subtask3 = manager.createSubtask(new Subtask("SUBTASK3", "SOMEOFSUBTASK3",
+                epic1.getId()));
+        Subtask subtask4 = manager.createSubtask(new Subtask("SUBTASK4", "SOMEOFSUBTASK4",
+                epic2.getId()));
+        Subtask subtask5 = manager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
+                epic2.getId()));
 
-            manager.getTaskById(task1.getId());
-            assertEquals(1, manager.getHistory().size(), "В истории должен быть 1 таск");
-            manager.getTaskById(task2.getId());
-            manager.getTaskById(task3.getId());
-            manager.getTaskById(task4.getId());
-            manager.getTaskById(task5.getId());
+        manager.getTaskById(task1.getId());
+        assertEquals(1, manager.getHistory().size(), "В истории должен быть 1 таск");
+        manager.getTaskById(task2.getId());
+        manager.getTaskById(task3.getId());
+        manager.getTaskById(task4.getId());
+        manager.getTaskById(task5.getId());
 
-            manager.getEpicById(epic1.getId());
-            manager.getEpicById(epic2.getId());
+        manager.getEpicById(epic1.getId());
+        manager.getEpicById(epic2.getId());
 
-            manager.getSubtaskById(subtask1.getId());
-            manager.getSubtaskById(subtask2.getId());
-            manager.getSubtaskById(subtask3.getId());
-            assertEquals(10, manager.getHistory().size(), "Некорректное количество тасков в истории");
-            manager.getSubtaskById(subtask4.getId());
-            manager.getSubtaskById(subtask5.getId());
-            assertEquals(12, manager.getHistory().size(), "В истории не 12 последних тасков");
+        manager.getSubtaskById(subtask1.getId());
+        manager.getSubtaskById(subtask2.getId());
+        manager.getSubtaskById(subtask3.getId());
+        assertEquals(10, manager.getHistory().size(), "Некорректное количество тасков в истории");
+        manager.getSubtaskById(subtask4.getId());
+        manager.getSubtaskById(subtask5.getId());
+        assertEquals(12, manager.getHistory().size(), "В истории не 12 последних тасков");
 
-            manager.getTaskById(task1.getId());
-            assertEquals(task2, manager.getHistory().getFirst(), "Объект после повторного обращения не" +
-                    "переместился в конец истории");
-            manager.getTaskById(task2.getId());
-            assertEquals(12, manager.getHistory().size(), "История обновляется некорректно");
+        manager.getTaskById(task1.getId());
+        assertEquals(task2, manager.getHistory().getFirst(), "Объект после повторного обращения не" +
+                "переместился в конец истории");
+        manager.getTaskById(task2.getId());
+        assertEquals(12, manager.getHistory().size(), "История обновляется некорректно");
 
-            assertEquals(task2, manager.getHistory().getLast(), "Объект после повторного обращения не" +
-                    "переместился в конец истории");
+        assertEquals(task2, manager.getHistory().getLast(), "Объект после повторного обращения не" +
+                "переместился в конец истории");
 
-            manager.deleteAllEpics();
-            assertEquals(5, manager.getHistory().size(), "Не удалились Эпики и их Сабтаски из истории");
+        manager.deleteAllEpics();
+        assertEquals(5, manager.getHistory().size(), "Не удалились Эпики и их Сабтаски из истории");
 
-            Epic epic3 = manager.createEpic(new Epic("Epic3", "EPIC3DESCRIPTION"));
-            Subtask subtask6 = manager.createSubtask(new Subtask("SUBTASK6",
-                    "SUBTASK6DESCRIPTION", 13));
-            manager.getEpicById(epic3.getId());
-            manager.getSubtaskById(subtask6.getId());
-            manager.deleteAllSubtasks();
-            assertEquals(6, manager.getHistory().size(), "Удаленные Сабтаски не удалились из истории");
+        Epic epic3 = manager.createEpic(new Epic("Epic3", "EPIC3DESCRIPTION"));
+        Subtask subtask6 = manager.createSubtask(new Subtask("SUBTASK6",
+                "SUBTASK6DESCRIPTION", 13));
+        manager.getEpicById(epic3.getId());
+        manager.getSubtaskById(subtask6.getId());
+        manager.deleteAllSubtasks();
+        assertEquals(6, manager.getHistory().size(), "Удаленные Сабтаски не удалились из истории");
 
-            manager.deleteAllTasks();
-            assertEquals(1, manager.getHistory().size(), "Удаленные Таски не удалились из истории");
+        manager.deleteAllTasks();
+        assertEquals(1, manager.getHistory().size(), "Удаленные Таски не удалились из истории");
 
-            manager.removeEpic(epic3.getId());
-            assertEquals(0, manager.getHistory().size(), "Удаленный Эпик по id не удалился из истории");
+        manager.removeEpic(epic3.getId());
+        assertEquals(0, manager.getHistory().size(), "Удаленный Эпик по id не удалился из истории");
 
-            manager.createTask(task1);
-            manager.createTask(task2);
-            Epic epic4 = manager.createEpic(new Epic("EPIC4", "SOMEEPIC4"));
-            Subtask subtask7 = manager.createSubtask(new Subtask("Subtask7", "Somesubtask7",
-                    epic4.getId()));
-            Subtask subtask8 = manager.createSubtask(new Subtask("Subtask8", "Somesubtask8",
-                    epic4.getId()));
+        manager.createTask(task1);
+        manager.createTask(task2);
+        Epic epic4 = manager.createEpic(new Epic("EPIC4", "SOMEEPIC4"));
+        Subtask subtask7 = manager.createSubtask(new Subtask("Subtask7", "Somesubtask7",
+                epic4.getId()));
+        Subtask subtask8 = manager.createSubtask(new Subtask("Subtask8", "Somesubtask8",
+                epic4.getId()));
 
+        manager.getEpicById(epic4.getId());
+        manager.getTaskById(task1.getId());
+        manager.getTaskById(task2.getId());
+        manager.getSubtaskById(subtask7.getId());
+        manager.getSubtaskById(subtask8.getId());
+        manager.getSubtaskById(subtask7.getId());
 
-            manager.getEpicById(epic4.getId());
-            manager.getTaskById(task1.getId());
-            manager.getTaskById(task2.getId());
-            manager.getSubtaskById(subtask7.getId());
-            manager.getSubtaskById(subtask8.getId());
-            manager.getSubtaskById(subtask7.getId());
+        manager.removeSubtask(subtask7.getId());
 
-            manager.removeSubtask(subtask7.getId());
+        assertEquals(4, manager.getHistory().size(), "Некорректно удаляется Сабтаск из истории");
 
-            assertEquals(4, manager.getHistory().size(), "Некорректно удаляется Сабтаск из истории");
+        manager.removeTask(task2.getId());
+        assertEquals(3, manager.getHistory().size(), "Некорректно удаляется Таск из истории");
 
-            manager.removeTask(task2.getId());
-            assertEquals(3, manager.getHistory().size(), "Некорректно удаляется Таск из истории");
-
-            manager.removeEpic(epic4.getId());
-            assertEquals(1, manager.getHistory().size(), "Удаленный Эпик по id не удалился из истории");
-        } catch (NotFoundException exception) {
-            System.out.println(exception.getMessage());
-        }
+        manager.removeEpic(epic4.getId());
+        assertEquals(1, manager.getHistory().size(), "Удаленный Эпик по id не удалился из истории");
     }
 
 
@@ -275,16 +261,18 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 start.plusMinutes(30), duration));
         assertEquals(2, manager.getAllTasks().size(), "Некорректная проверка временных интервалов," +
                 " временные интервалы не пересекаются");
-        manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW,
-                start.plusMinutes(30), duration));
+        assertThrows(DateTimeIntersectionException.class, () -> manager.createTask(new Task("TASK3",
+                "SOMETHINGTODO3", TaskStatus.NEW, start.plusMinutes(30), duration)));
         assertEquals(2, manager.getAllTasks().size(), "Некорректная проверка временных интервалов," +
                 " временные интервалы пересекаются");
-        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW,
-                start.minusMinutes(30), duration.plusMinutes(30)));
+        assertThrows(DateTimeIntersectionException.class, () -> manager.createTask(new Task("TASK3",
+                "SOMETHINGTODO3", TaskStatus.NEW, start.minusMinutes(30),
+                duration.plusMinutes(30))));
         assertEquals(2, manager.getAllTasks().size(), "Некорректная проверка временных интервалов," +
                 " временные интервалы пересекаются");
-        Task task4 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW,
-                start.minusMinutes(30), duration.plusMinutes(10)));
+        assertThrows(DateTimeIntersectionException.class, () -> manager.createTask(new Task("TASK4",
+                "SOMETHINGTODO4", TaskStatus.NEW, start.minusMinutes(30),
+                duration.plusMinutes(10))));
         assertEquals(2, manager.getAllTasks().size(), "Некорректная проверка временных интервалов," +
                 " временные интервалы пересекаются");
         Task task5 = manager.createTask(new Task("TASK4", "SOMETHINGTODO4", TaskStatus.NEW,
@@ -359,7 +347,5 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
                 "в приоритетном списке тасков после удаления эпика (correct: task3, task2, task1)");
         assertEquals(3, manager.getPrioritizedTasks().size(), "Ошибка удаления тасков в" +
                 " prioritizedTasks");
-
     }
-
 }
