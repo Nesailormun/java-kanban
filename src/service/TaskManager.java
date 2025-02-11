@@ -44,7 +44,6 @@ public interface TaskManager {
 
     void deleteAllEpics();
 
-
     List<Subtask> getEpicsSubtasks(Epic epic) throws NullEqualsException;
 
     // Beginning of module.Subtask methods:

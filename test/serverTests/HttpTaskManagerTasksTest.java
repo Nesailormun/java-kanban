@@ -102,7 +102,7 @@ public class HttpTaskManagerTasksTest {
                 start.plusMinutes(30), duration));
 
         //обновляем существующий Таск новым корректным таском
-        Task task = new Task(2,"NEWTASK 2", "Testing task 2",
+        Task task = new Task(2, "NEWTASK 2", "Testing task 2",
                 TaskStatus.NEW, LocalDateTime.now(), Duration.ofMinutes(30));
         String taskJson = gson.toJson(task);
         URI url = URI.create("http://localhost:8080/tasks/2");
@@ -115,7 +115,7 @@ public class HttpTaskManagerTasksTest {
         assertEquals(task, manager.getTaskById(task.getId()), "Некорректно обновляются задачи");
 
         //тест на обновление таска, которого нет в базе, должен вернуть 404
-        Task task1 = new Task(3,"NEWTASK 3", "Testing task 3",
+        Task task1 = new Task(3, "NEWTASK 3", "Testing task 3",
                 TaskStatus.NEW, start.plusMinutes(90), duration);
         String taskJson1 = gson.toJson(task1);
         URI url1 = URI.create("http://localhost:8080/tasks/3");
@@ -128,7 +128,7 @@ public class HttpTaskManagerTasksTest {
         assertEquals(404, response1.statusCode());
 
         //тест обновления на таск с пересекающимся временным интервалом, Должен вернуть код 406
-        Task task2 = new Task(2,"WRONGTASK", "Testing task 4",
+        Task task2 = new Task(2, "WRONGTASK", "Testing task 4",
                 TaskStatus.NEW, start, duration);
         String taskJson2 = gson.toJson(task2);
         URI url2 = URI.create("http://localhost:8080/tasks/2");
@@ -141,7 +141,7 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
-    public void testDeleteTask() throws IOException, InterruptedException{
+    public void testDeleteTask() throws IOException, InterruptedException {
         LocalDateTime start = LocalDateTime.of(2025, 2, 7, 10, 0);
         Duration duration = Duration.ofMinutes(30);
         manager.createTask(new Task("TASK1", "SOMETASK", TaskStatus.DONE, start, duration));

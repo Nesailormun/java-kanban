@@ -111,7 +111,7 @@ public class HttpTaskManagerSubtasksTest {
                 start.plusMinutes(30), duration));
 
         //обновляем существующий Сабтаск новым корректным сабтаском
-        Subtask subtask = new Subtask(2,"NEWSUBTASK 1", "WOWOWOW",
+        Subtask subtask = new Subtask(2, "NEWSUBTASK 1", "WOWOWOW",
                 TaskStatus.IN_PROGRESS, 1, LocalDateTime.now(), Duration.ofMinutes(30));
         String subtaskJson = gson.toJson(subtask);
         URI url = URI.create("http://localhost:8080/subtasks/2");
@@ -125,9 +125,9 @@ public class HttpTaskManagerSubtasksTest {
         assertEquals(2, manager.getAllSubtasks().size(), "Некорректно обновляются задачи");
         assertEquals(TaskStatus.IN_PROGRESS, epic1.getStatus(), "Некорректно обновляются задачи(статус Эпика)");
 
-       //тест на обновление сабтаска, которого нет в базе, должен вернуть 404
-        Subtask subtask1 = new Subtask(4,"NEWSUBTASK 2", "SUBTAAAAASSKKK",
-                TaskStatus.NEW,1, start.plusMinutes(90), duration);
+        //тест на обновление сабтаска, которого нет в базе, должен вернуть 404
+        Subtask subtask1 = new Subtask(4, "NEWSUBTASK 2", "SUBTAAAAASSKKK",
+                TaskStatus.NEW, 1, start.plusMinutes(90), duration);
         String taskJson1 = gson.toJson(subtask1);
         URI url1 = URI.create("http://localhost:8080/subtasks/4");
         HttpRequest request1 = HttpRequest.newBuilder()
@@ -138,8 +138,8 @@ public class HttpTaskManagerSubtasksTest {
         assertEquals(404, response1.statusCode());
 
         //тест обновления на сабтаск с пересекающимся временным интервалом, Должен вернуть код 406
-        Subtask subtask2 = new Subtask(3,"NEWSUBTASK 2", "SUBTAAAAASSKKK",
-                TaskStatus.NEW,1, subtask.getStartTime(), duration);
+        Subtask subtask2 = new Subtask(3, "NEWSUBTASK 2", "SUBTAAAAASSKKK",
+                TaskStatus.NEW, 1, subtask.getStartTime(), duration);
         String taskJson2 = gson.toJson(subtask2);
         URI url2 = URI.create("http://localhost:8080/subtasks/3");
         HttpRequest request2 = HttpRequest.newBuilder()
@@ -150,8 +150,8 @@ public class HttpTaskManagerSubtasksTest {
         assertEquals(406, response2.statusCode());
 
         //тест обновления сабтаска на сабтаск с неверным эпик айди, вернет 404
-        Subtask subtask3 = new Subtask(3,"NEWSUBTASK 2", "SUBTAAAAASSKKK",
-                TaskStatus.NEW,2, subtask.getStartTime().plusMinutes(30), duration);
+        Subtask subtask3 = new Subtask(3, "NEWSUBTASK 2", "SUBTAAAAASSKKK",
+                TaskStatus.NEW, 2, subtask.getStartTime().plusMinutes(30), duration);
         String taskJson3 = gson.toJson(subtask3);
         URI url3 = URI.create("http://localhost:8080/subtasks/3");
         HttpRequest request3 = HttpRequest.newBuilder()
@@ -163,7 +163,7 @@ public class HttpTaskManagerSubtasksTest {
     }
 
     @Test
-    public void testDeleteSubtask() throws IOException, InterruptedException{
+    public void testDeleteSubtask() throws IOException, InterruptedException {
         LocalDateTime start = LocalDateTime.of(2025, 2, 7, 10, 0);
         Duration duration = Duration.ofMinutes(30);
         Epic epic1 = manager.createEpic(new Epic("epic1", "SomeEpic1"));

@@ -18,11 +18,10 @@ public class BaseHttpHandler implements HttpHandler {
     protected final Gson gson;
     protected static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-    public BaseHttpHandler(TaskManager manager,Gson gson) {
+    public BaseHttpHandler(TaskManager manager, Gson gson) {
         this.manager = manager;
         this.gson = gson;
     }
-
 
     @Override
     public void handle(HttpExchange exchange) {
@@ -66,7 +65,7 @@ public class BaseHttpHandler implements HttpHandler {
     }
 
 
-    protected void sendHasInteractions(HttpExchange h, String text)  {
+    protected void sendHasInteractions(HttpExchange h, String text) {
         byte[] resp = text.getBytes(StandardCharsets.UTF_8);
         try (OutputStream os = h.getResponseBody()) {
             h.sendResponseHeaders(406, resp.length);
@@ -99,12 +98,12 @@ public class BaseHttpHandler implements HttpHandler {
         }
     }
 
-        protected Optional<Integer> getTaskId (String[] pathParts){
-            try {
-                return Optional.of(Integer.parseInt(pathParts[2]));
-            } catch (NumberFormatException exception) {
-                System.out.println("Неверный формат идентификатора");
-                return Optional.empty();
-            }
+    protected Optional<Integer> getTaskId(String[] pathParts) {
+        try {
+            return Optional.of(Integer.parseInt(pathParts[2]));
+        } catch (NumberFormatException exception) {
+            System.out.println("Неверный формат идентификатора");
+            return Optional.empty();
         }
     }
+}

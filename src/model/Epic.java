@@ -5,11 +5,11 @@ import enums.TaskType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-
 public class Epic extends Task {
 
     private final ArrayList<Integer> subtasksId = new ArrayList<>();
     private LocalDateTime endTime;
+
 
     public Epic(String name, String description) {
         super(name, description);

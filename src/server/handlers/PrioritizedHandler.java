@@ -11,16 +11,13 @@ public class PrioritizedHandler extends BaseHttpHandler {
     public PrioritizedHandler(TaskManager manager, Gson gson) {
         super(manager, gson);
     }
+
     @Override
     public void handle(HttpExchange httpExchange) {
         String[] pathParts = httpExchange.getRequestURI().getPath().split("/");
         String method = httpExchange.getRequestMethod();
         try {
-            if (!method.equals("GET")) {
-                sendBadRequest(httpExchange);
-                return;
-            }
-            if (!(pathParts.length == 2)) {
+            if ((!method.equals("GET")) || !(pathParts.length == 2)) {
                 sendBadRequest(httpExchange);
                 return;
             }

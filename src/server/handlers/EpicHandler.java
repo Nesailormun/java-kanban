@@ -37,6 +37,7 @@ public class EpicHandler extends BaseHttpHandler {
                         break;
                     } else if (pathParts.length == 4 && pathParts[pathParts.length - 1].equals("subtasks")) {
                         handleGetEpicsSubtasks(exchange, getTaskId(pathParts).get());
+                        break;
                     }
                     sendBadRequest(exchange);
                     break;
@@ -83,11 +84,11 @@ public class EpicHandler extends BaseHttpHandler {
         }
     }
 
-    private void handleGetEpicsSubtasks(HttpExchange exchange, Integer epicId){
+    private void handleGetEpicsSubtasks(HttpExchange exchange, Integer epicId) {
         try {
             String response = gson.toJson(manager.getEpicsSubtasks(manager.getEpicById(epicId)));
             sendText(exchange, response);
-        } catch (IOException e){
+        } catch (IOException e) {
             sendServerError(exchange);
         } catch (NotFoundException | NullEqualsException e) {
             sendNotFound(exchange, e.getMessage());
