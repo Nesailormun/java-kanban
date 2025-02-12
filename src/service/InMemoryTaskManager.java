@@ -220,7 +220,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NotFoundException("Exception! Not founded epic, incorrect id!");
         epicStorage.get(epic.getId()).setName(epic.getName());
         epicStorage.get(epic.getId()).setDescription(epic.getDescription());
-
     }
 
     @Override

@@ -11,22 +11,18 @@ import service.TaskManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class HttpTaskServer {
 
     private static final int PORT = 8080;
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private static HttpServer httpServer;
     private static TaskManager manager;
-    private static Gson gson;
+    private static final Gson gson = getGson();
 
-    public HttpTaskServer(TaskManager manager, Gson gson) throws IOException {
+    public HttpTaskServer(TaskManager manager) throws IOException {
         HttpTaskServer.manager = manager;
-        HttpTaskServer.gson = gson;
         httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TaskHandler(manager, gson));
         httpServer.createContext("/subtasks", new SubtaskHandler(manager, gson));
@@ -37,17 +33,18 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        HttpTaskServer httpTaskServer = new HttpTaskServer(Manager.getDefault(), HttpTaskServer.getGson());
+        HttpTaskServer httpTaskServer = new HttpTaskServer(Manager.getDefault());
         HttpTaskServer.start();
-        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
 
     public static void start() {
         httpServer.start();
+        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
     }
 
     public static void stop() {
         httpServer.stop(0);
+        System.out.println("HTTP-сервер остановлен! Порт " + PORT + " свободен!");
     }
 
     public static Gson getGson() {

@@ -25,7 +25,7 @@ public class HttpTaskManagerTasksTest {
 
     TaskManager manager = Manager.getDefault();
     Gson gson = HttpTaskServer.getGson();
-    HttpTaskServer taskServer = new HttpTaskServer(manager, gson);
+    HttpTaskServer taskServer = new HttpTaskServer(manager);
     HttpClient client = HttpClient.newHttpClient();
 
     public HttpTaskManagerTasksTest() throws IOException {

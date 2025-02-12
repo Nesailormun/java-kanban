@@ -28,7 +28,7 @@ public class HttpTaskManagerHistoryTest {
 
     TaskManager manager = Manager.getDefault();
     Gson gson = HttpTaskServer.getGson();
-    HttpTaskServer taskServer = new HttpTaskServer(manager, gson);
+    HttpTaskServer taskServer = new HttpTaskServer(manager);
     HttpClient client = HttpClient.newHttpClient();
 
     public HttpTaskManagerHistoryTest() throws IOException {

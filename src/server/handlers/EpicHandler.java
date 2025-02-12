@@ -3,9 +3,11 @@ package server.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import enums.Endpoint;
+import exceptions.DateTimeIntersectionException;
 import exceptions.NotFoundException;
 import exceptions.NullEqualsException;
 import model.Epic;
+import model.Task;
 import service.TaskManager;
 
 import java.io.IOException;
@@ -45,6 +47,9 @@ public class EpicHandler extends BaseHttpHandler {
                 case POST: {
                     if (pathParts.length == 2) {
                         handleCreateEpic(exchange);
+                        break;
+                    } else if (pathParts.length == 3) {
+                        handleUpdateEpic(exchange, getTaskId(pathParts).get());
                         break;
                     }
                     sendBadRequest(exchange);
@@ -118,6 +123,21 @@ public class EpicHandler extends BaseHttpHandler {
         } catch (IOException e) {
             sendServerError(exchange);
         } catch (NullEqualsException e) {
+            sendNotFound(exchange, e.getMessage());
+        }
+    }
+
+    private void handleUpdateEpic(HttpExchange exchange, Integer taskId) {
+        try {
+            InputStream inputStream = exchange.getRequestBody();
+            String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
+            Epic epic = gson.fromJson(body, Epic.class);
+            manager.updateEpic(epic);
+            String response = "Эпик с идентификатором: " + taskId + " успешно обновлен!";
+            sendModified(exchange, response);
+        } catch (IOException e) {
+            sendServerError(exchange);
+        } catch (NullEqualsException | NotFoundException e) {
             sendNotFound(exchange, e.getMessage());
         }
     }

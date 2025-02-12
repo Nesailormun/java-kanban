@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import enums.TaskStatus;
 import model.Epic;
 import model.Subtask;
+import model.Task;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -30,7 +31,7 @@ public class HttpTaskManagerEpicsTest {
 
     TaskManager manager = Manager.getDefault();
     Gson gson = HttpTaskServer.getGson();
-    HttpTaskServer taskServer = new HttpTaskServer(manager, gson);
+    HttpTaskServer taskServer = new HttpTaskServer(manager);
     HttpClient client = HttpClient.newHttpClient();
 
     public HttpTaskManagerEpicsTest() throws IOException {
@@ -174,6 +175,41 @@ public class HttpTaskManagerEpicsTest {
                 .GET()
                 .build();
         HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, response1.statusCode());
+    }
+
+    @Test
+    public void testUpdateEpic() throws IOException, InterruptedException {
+        LocalDateTime start = LocalDateTime.of(2025, 2, 7, 10, 0);
+        Duration duration = Duration.ofMinutes(30);
+        Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
+        manager.createSubtask(new Subtask("SUBTASK1", "SOMETASK", TaskStatus.DONE, 1,
+                start, duration));
+        manager.createSubtask(new Subtask("SUBTASK2", "SOMETASK", TaskStatus.DONE, 1,
+                start.plusMinutes(30), duration));
+        Epic newEpic1 = new Epic(1, "NEWEPIC1", "SOMETHINGNEW");
+        String epicJson = gson.toJson(newEpic1, Epic.class);
+        //обновляем существующий Эпик новым корректным эпиком
+        URI url = URI.create("http://localhost:8080/epics/1");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .POST(HttpRequest.BodyPublishers.ofString(epicJson))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+        assertEquals(newEpic1.getName(), manager.getEpicById(newEpic1.getId()).getName(),
+                "Некорректно обновляются Эпики");
+
+        //тест на обновление эпика, которого нет в базе, должен вернуть 404
+        Epic wrongEpic = new Epic(33, "WRONGEPIC", "SOMETHING");
+        String wrongEpicJson = gson.toJson(wrongEpic);
+        URI url1 = URI.create("http://localhost:8080/epics/33");
+        HttpRequest request1 = HttpRequest.newBuilder()
+                .uri(url1)
+                .POST(HttpRequest.BodyPublishers.ofString(wrongEpicJson))
+                .build();
+        HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        assertEquals(1, manager.getAllEpics().size(), "Некорректно обновляются эпики");
         assertEquals(404, response1.statusCode());
     }
 
