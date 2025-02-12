@@ -3,11 +3,9 @@ package server.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import enums.Endpoint;
-import exceptions.DateTimeIntersectionException;
 import exceptions.NotFoundException;
 import exceptions.NullEqualsException;
 import model.Epic;
-import model.Task;
 import service.TaskManager;
 
 import java.io.IOException;
