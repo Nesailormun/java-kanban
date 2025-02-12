@@ -1,4 +1,7 @@
-package module;
+package model;
+
+import enums.TaskStatus;
+import enums.TaskType;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -49,7 +52,6 @@ public class Subtask extends Task {
             return String.format("%d,%s,%s,%s,%s,%d", id, getType(), name, status, description, epicId);
         return String.format("%d,%s,%s,%s,%s,%s,%d,%d", id, getType(), name, status, description, startTime,
                 getDuration().toMinutes(), epicId);
-
     }
 
     @Override

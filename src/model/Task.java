@@ -1,4 +1,7 @@
-package module;
+package model;
+
+import enums.TaskStatus;
+import enums.TaskType;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -10,8 +13,8 @@ public class Task {
     protected String name;
     protected String description;
     protected TaskStatus status;
-    protected Duration duration;
     protected LocalDateTime startTime;
+    protected Duration duration;
 
     public Task(int id, String name, String description, TaskStatus status) {
         this.id = id;

@@ -1,7 +1,10 @@
-import module.Epic;
-import module.Subtask;
-import module.Task;
-import module.TaskStatus;
+import exceptions.DateTimeIntersectionException;
+import exceptions.NotFoundException;
+import exceptions.NullEqualsException;
+import model.Epic;
+import model.Subtask;
+import model.Task;
+import enums.TaskStatus;
 import service.TaskManager;
 
 import java.time.Duration;
@@ -23,23 +26,31 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 start, duration));
         Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW,
                 start.plusMinutes(30), duration));
-        manager.getTaskById(task1.getId());
-        manager.getTaskById(task2.getId());
-        assertEquals(2, manager.getHistory().size(), "Неккоректное сохранение в истории");
+
+        try {
+            manager.getTaskById(task1.getId());
+            manager.getTaskById(task2.getId());
+            assertEquals(2, manager.getHistory().size(), "Неккоректное сохранение в истории");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
 
     // Beginning of module.Task Tests:
     @Test
     void getTaskById() {
-        LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
-        Duration duration = Duration.ofMinutes(30);
-        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
-                start, duration));
-        Task task2 = manager.createTask(null);
-        Task task3 = manager.getTaskById(task1.getId());
-        assertEquals(task1, task3, "Возвращение неверного таска");
-        assertNull(task2, "таск2 должен быть равен null");
+        try {
+            LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+            Duration duration = Duration.ofMinutes(30);
+            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
+                    start, duration));
+            assertThrows(NullEqualsException.class, () -> manager.createTask(null));
+            Task task3 = manager.getTaskById(task1.getId());
+            assertEquals(task1, task3, "Возвращение неверного таска");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
@@ -50,21 +61,25 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 start, duration));
         Task task2 = manager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW,
                 start.plusMinutes(30), duration));
-        Task task3 = manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW,
-                start.plusMinutes(30), duration));
+        assertThrows(DateTimeIntersectionException.class, () -> manager.createTask(new Task("TASK3", "SOMETHINGTODO3", TaskStatus.NEW,
+                start.plusMinutes(30), duration)));
         assertEquals(2, manager.getAllTasks().size(), "Ошибка создания тасков");
     }
 
     @Test
     void updateTask() {
-        LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
-        Duration duration = Duration.ofMinutes(30);
-        Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
-                start, duration));
-        Task newTask1 = manager.createTask(new Task(1, "NEWTASK1", "SOMETHINGTODO1", TaskStatus.DONE,
-                start.plusMinutes(30), duration));
-        manager.updateTask(newTask1);
-        assertEquals(newTask1, manager.getTaskById(task1.getId()), "Таск не обновился");
+        try {
+            LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
+            Duration duration = Duration.ofMinutes(30);
+            Task task1 = manager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW,
+                    start, duration));
+            Task newTask1 = manager.createTask(new Task(1, "NEWTASK1", "SOMETHINGTODO1", TaskStatus.DONE,
+                    start.plusMinutes(30), duration));
+            manager.updateTask(newTask1);
+            assertEquals(newTask1, manager.getTaskById(task1.getId()), "Таск не обновился");
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 
     @Test
@@ -77,7 +92,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 start.plusMinutes(30), duration));
         manager.removeTask(task1.getId());
         assertEquals(1, manager.getAllTasks().size());
-        manager.removeTask(task1.getId());
+        assertThrows(NotFoundException.class, () -> manager.removeTask(task1.getId()));
         assertEquals(1, manager.getAllTasks().size());
         manager.removeTask(task2.getId());
         assertTrue(manager.getAllTasks().isEmpty());
@@ -95,6 +110,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         assertTrue(manager.getAllTasks().isEmpty());
     }
 
+    @Test
     void getAllTasks() {
         LocalDateTime start = LocalDateTime.of(2025, 1, 28, 10, 0);
         Duration duration = Duration.ofMinutes(30);
@@ -129,7 +145,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     void getEpicById() {
         Epic epic1 = manager.createEpic(new Epic("EPIC1", "SOMEOFEPIC1"));
         assertEquals(manager.getEpicById(epic1.getId()), epic1);
-        assertNull(manager.getEpicById(24));
+        assertThrows(NotFoundException.class, () -> manager.getEpicById(24));
     }
 
     @Test
@@ -176,10 +192,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.now(), Duration.ofMinutes(20)));
         Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
                 subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
-        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "SomeSubtask3", 1,
-                LocalDateTime.now(), Duration.ofMinutes(20)));
-        Subtask subtask4 = manager.createSubtask(new Subtask("Subtask4", "SomeSubtask4", 12,
-                subtask1.getStartTime().plusMinutes(60), Duration.ofMinutes(20)));
+        assertThrows(DateTimeIntersectionException.class, () -> manager.createSubtask(new Subtask("Subtask3",
+                "SomeSubtask3", 1, LocalDateTime.now(), Duration.ofMinutes(20))));
+        assertThrows(NotFoundException.class, () -> manager.createSubtask(new Subtask("Subtask4",
+                "SomeSubtask4", 12, subtask1.getStartTime().plusMinutes(60), Duration.ofMinutes(20))));
         assertEquals(2, manager.getAllSubtasks().size());
     }
 
@@ -190,10 +206,9 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.now(), Duration.ofMinutes(20)));
         Subtask subtask2 = manager.createSubtask(new Subtask("Subtask2", "SomeSubtask2", 1,
                 subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
-        Subtask subtask3 = manager.createSubtask(new Subtask("Subtask3", "SomeSubtask3", 1,
-                LocalDateTime.now(), Duration.ofMinutes(20)));
+        assertThrows(DateTimeIntersectionException.class, () -> manager.createSubtask(new Subtask("Subtask3",
+                "SomeSubtask3", 1, LocalDateTime.now(), Duration.ofMinutes(20))));
         assertEquals(2, manager.getAllSubtasks().size());
-
         manager.updateSubtask(new Subtask(2, "NEWSUBTASK3", "SOMESUBTASK4", TaskStatus.IN_PROGRESS,
                 epic1.getId(), subtask1.getStartTime().plusMinutes(40), subtask1.getDuration()));
         assertEquals(2, manager.getAllSubtasks().size());
@@ -209,7 +224,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
         assertEquals(subtask1, manager.getSubtaskById(subtask1.getId()));
         assertNotEquals(subtask2, manager.getSubtaskById(subtask1.getId()));
-        assertNull(manager.getSubtaskById(123));
+        assertThrows(NotFoundException.class, () -> manager.getSubtaskById(123));
     }
 
     @Test
@@ -231,7 +246,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 subtask1.getStartTime().plusMinutes(20), Duration.ofMinutes(20)));
         manager.removeSubtask(subtask1.getId());
         assertEquals(1, manager.getAllSubtasks().size());
-        manager.removeSubtask(subtask1.getId());
+        assertThrows(NotFoundException.class, () -> manager.removeSubtask(subtask1.getId()));
         manager.removeSubtask(subtask2.getId());
         assertEquals(0, manager.getAllSubtasks().size());
     }

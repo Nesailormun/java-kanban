@@ -1,12 +1,13 @@
-import module.*;
+import enums.TaskStatus;
+import exceptions.NotFoundException;
+import model.*;
 import service.Manager;
 import service.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
-
-        Manager manager = new Manager();
-        TaskManager taskManager = manager.getDefault();
+        ;
+        TaskManager taskManager = Manager.getDefault();
 
         Task task1 = taskManager.createTask(new Task("TASK1", "SOMETHINGTODO1", TaskStatus.NEW));
         Task task2 = taskManager.createTask(new Task("TASK2", "SOMETHINGTODO2", TaskStatus.NEW));
@@ -28,32 +29,36 @@ public class Main {
         Subtask subtask5 = taskManager.createSubtask(new Subtask("SUBTASK5", "SOMEOFSUBTASK5",
                 epic2.getId()));
 
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task2.getId());
-        taskManager.getTaskById(task3.getId());
-        taskManager.getTaskById(task4.getId());
-        taskManager.getTaskById(task5.getId());
+        try {
+            taskManager.getTaskById(task1.getId());
+            taskManager.getTaskById(task2.getId());
+            taskManager.getTaskById(task3.getId());
+            taskManager.getTaskById(task4.getId());
+            taskManager.getTaskById(task5.getId());
 
-        taskManager.getEpicById(epic1.getId());
-        taskManager.getEpicById(epic2.getId());
+            taskManager.getEpicById(epic1.getId());
+            taskManager.getEpicById(epic2.getId());
 
-        taskManager.getSubtaskById(subtask1.getId());
-        taskManager.getSubtaskById(subtask2.getId());
-        taskManager.getSubtaskById(subtask3.getId());
-        taskManager.getSubtaskById(subtask4.getId());
-        taskManager.getSubtaskById(subtask5.getId());
+            taskManager.getSubtaskById(subtask1.getId());
+            taskManager.getSubtaskById(subtask2.getId());
+            taskManager.getSubtaskById(subtask3.getId());
+            taskManager.getSubtaskById(subtask4.getId());
+            taskManager.getSubtaskById(subtask5.getId());
 
-        System.out.println(taskManager.getHistory());
+            System.out.println(taskManager.getHistory());
 
-        taskManager.getTaskById(task1.getId());
-        taskManager.getTaskById(task2.getId());
-        System.out.println(taskManager.getHistory().size());
-        System.out.println(taskManager.getHistory());
+            taskManager.getTaskById(task1.getId());
+            taskManager.getTaskById(task2.getId());
+            System.out.println(taskManager.getHistory().size());
+            System.out.println(taskManager.getHistory());
 
-        taskManager.removeTask(task1.getId());
-        taskManager.removeTask(task2.getId());
-        System.out.println(taskManager.getHistory().size());
-        System.out.println(taskManager.getHistory());
+            taskManager.removeTask(task1.getId());
+            taskManager.removeTask(task2.getId());
+            System.out.println(taskManager.getHistory().size());
+            System.out.println(taskManager.getHistory());
+        } catch (NotFoundException exception) {
+            System.out.println(exception.getMessage());
+        }
     }
 }
 
